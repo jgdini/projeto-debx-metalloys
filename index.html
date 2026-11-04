@@ -1,0 +1,699 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>Projeto Debx · Metalloys</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: cabeçalho fixo com abas; cada aba é uma seção; conteúdo em coluna de até 1180px. */
+:root {
+  --bg: #F6F4EF; --panel: #FFFFFF; --line: #DDD8CD; --line-soft: #ECE8DF;
+  --fg: #1B1F24; --muted: #4A515B; --accent: #0F5E68; --accent-soft: #D7E9EB;
+  --muted-bar: #CFCAC0; --warn: #8A5300; --warn-bg: #FCEFD9; --warn-line: #E3C58F;
+  --bad: #A8322A; --bad-bg: #F8E1DE; --ok: #1E6B3E; --ok-bg: #DDEEE3; --ok-line: #9CC7AC;
+  --serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14181C; --panel: #1C2227; --line: #323A41; --line-soft: #283036;
+    --fg: #E8E6E1; --muted: #A4ABB3; --accent: #5FB3BD; --accent-soft: #1F3B3F;
+    --muted-bar: #4A535B; --warn: #E8B35C; --warn-bg: #33291A; --warn-line: #6B5326;
+    --bad: #EE8A80; --bad-bg: #3A2220; --ok: #7CC99A; --ok-bg: #1D3226; --ok-line: #2F5A40;
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { scroll-padding-top: 120px; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--sans); font-size: 15px; line-height: 1.5; -webkit-text-size-adjust: 100%; }
+a { color: var(--accent); }
+h1, h2, h3 { font-family: var(--serif); text-wrap: balance; margin: 0; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+header.top { position: sticky; top: 0; z-index: 10; background: var(--bg); border-bottom: 1px solid var(--line); padding-top: env(safe-area-inset-top, 0px); }
+.top-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-block: 14px 8px; }
+.brand { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+.brand-t { font-family: var(--serif); font-size: 22px; font-weight: 700; line-height: 1.15; }
+.countdown { text-align: right; font-size: 13px; color: var(--muted); white-space: nowrap; }
+.countdown b { display: block; font-family: var(--serif); font-size: 22px; color: var(--fg); font-variant-numeric: tabular-nums; }
+nav.tabs { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+nav.tabs::-webkit-scrollbar { display: none; }
+nav.tabs a { flex-shrink: 0; text-decoration: none; color: var(--muted); font-weight: 500; padding: 10px 14px; border-bottom: 2px solid transparent; }
+nav.tabs a[aria-current="page"] { color: var(--fg); border-bottom-color: var(--accent); }
+nav.tabs a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+main { padding-block: 28px 64px; }
+section.page { display: flex; flex-direction: column; gap: 32px; }
+.lead { display: flex; flex-direction: column; gap: 8px; }
+.lead h1 { font-size: clamp(30px, 4vw, 44px); line-height: 1.08; }
+.lead p { margin: 0; color: var(--muted); max-width: 72ch; font-size: 16px; }
+.lead p b { color: var(--fg); font-weight: 600; }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 12px; border-radius: 999px; font-size: 13px; font-weight: 600; border: 1px solid currentColor; width: fit-content; white-space: nowrap; }
+.pill.ok { color: var(--ok); } .pill.warn { color: var(--warn); } .pill.bad { color: var(--bad); } .pill.plain { color: var(--muted); }
+
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+.tile { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.tile.warn { background: var(--warn-bg); border-color: var(--warn-line); }
+.tile.good { background: var(--ok-bg); border-color: var(--ok-line); }
+.tile .n { font-family: var(--serif); font-size: 36px; font-weight: 700; line-height: 1.05; font-variant-numeric: tabular-nums; color: var(--accent); }
+.tile.warn .n { color: var(--warn); } .tile.good .n { color: var(--ok); }
+.tile .l { font-weight: 600; }
+.tile .s { font-size: 13px; color: var(--muted); }
+
+.block { display: flex; flex-direction: column; gap: 12px; }
+.block > h2 { font-size: 26px; font-weight: 600; }
+.block > p.note { margin: -4px 0 0; color: var(--muted); font-size: 14px; max-width: 80ch; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 20px; min-width: 0; }
+.card h3 { font-family: var(--sans); font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+.card.warn h3 { color: var(--warn); }
+.card ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
+.card p { margin: 0 0 8px; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 14px; }
+.grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 14px; }
+.small { font-size: 13px; color: var(--muted); }
+
+.dec { background: var(--ok-bg); border: 1px solid var(--ok-line); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; }
+.dec .t { font-weight: 600; color: var(--ok); }
+.dec .d { font-size: 12px; font-weight: 600; color: var(--ok); opacity: .85; }
+.blk { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+.blk .h { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.blk .h b { font-size: 16px; }
+.blk .who { font-size: 13px; color: var(--muted); }
+
+.chart { position: relative; width: 100%; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart text { font-family: var(--sans); font-size: 12px; fill: var(--muted); }
+.chart text.v { fill: var(--fg); font-weight: 600; font-variant-numeric: tabular-nums; }
+.chart text.st { fill: var(--fg); font-weight: 600; }
+.legend { display: flex; flex-wrap: wrap; gap: 16px; font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+.legend i { display: inline-block; width: 11px; height: 11px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+.tip { position: absolute; pointer-events: none; z-index: 5; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.12); padding: 6px 10px; font-size: 13px; white-space: nowrap; }
+.tip .th { color: var(--muted); font-size: 12px; }
+
+.tl { display: flex; flex-direction: column; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 4px 18px; }
+.tl .row { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 14px; padding: 11px 0; border-bottom: 1px solid var(--line-soft); }
+.tl .row:last-child { border-bottom: none; }
+.tl .dt { font-weight: 600; color: var(--accent); font-variant-numeric: tabular-nums; }
+.tl .row.big .dt { color: var(--warn); }
+
+.tbox { overflow: auto; max-height: 560px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+.tbox.auto { max-height: none; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th { position: sticky; top: 0; background: var(--panel); text-align: left; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); padding: 10px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+td { padding: 9px 12px; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+td.r, th.r { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+td.nw { white-space: nowrap; }
+tfoot td { font-weight: 600; border-top: 1px solid var(--line); }
+.filters { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+select, input[type=search] { font: inherit; font-size: 14px; color: var(--fg); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; min-height: 40px; max-width: 100%; }
+input[type=search] { flex: 1 1 220px; min-width: 0; }
+button.clear { font: inherit; font-size: 13px; color: var(--muted); background: none; border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; min-height: 40px; cursor: pointer; }
+.count { font-size: 13px; color: var(--muted); }
+
+.stars { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+.star { background: var(--panel); border: 1px solid var(--line); border-top: 4px solid var(--accent); border-radius: 12px; padding: 14px 18px; }
+.star b { display: block; font-family: var(--serif); font-size: 20px; font-weight: 600; }
+.star span { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.star.wide { grid-column: 1 / -1; background: var(--ok-bg); border-color: var(--ok-line); border-top-color: var(--ok); }
+.star.wide span { color: var(--ok); }
+
+.flow { display: grid; grid-template-columns: minmax(0, 1fr) 120px minmax(0, 1fr); gap: 12px; align-items: center; }
+.flow .sys { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+.flow .sys b { font-family: var(--serif); font-size: 20px; display: block; margin-bottom: 6px; }
+.flow .arrows { display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: var(--muted); text-align: center; }
+.flow .arrows span { border-top: 2px solid var(--accent); padding-top: 4px; }
+.phases { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr)); gap: 10px; }
+.phase { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; background: var(--panel); display: flex; flex-direction: column; gap: 4px; }
+.phase.done { border-color: var(--ok-line); background: var(--ok-bg); }
+.phase.now { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.phase b { font-size: 15px; }
+footer { border-top: 1px solid var(--line); padding-block: 18px 32px; font-size: 13px; color: var(--muted); }
+@media (max-width: 640px) {
+  .hide-sm { display: none; }
+  .flow { grid-template-columns: 1fr; }
+  .flow .arrows { flex-direction: row; justify-content: center; }
+  .tl .row { grid-template-columns: 74px minmax(0, 1fr); }
+  .brand-t { font-size: 18px; }
+}
+@media (prefers-reduced-motion: no-preference) { section.page { animation: fade .25s ease-out; } @keyframes fade { from { opacity: .4; } to { opacity: 1; } } }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="top-row">
+      <div class="brand"><span class="eyebrow">Grupo Metalloys · Implantação</span><span class="brand-t">Projeto Debx + CRM Ejecty</span></div>
+      <div class="countdown"><b id="hdr-dias">—</b>dias para o go-live</div>
+    </div>
+    <nav class="tabs" aria-label="Seções">
+      <a href="#visao" data-tab="visao">Visão geral</a>
+      <a href="#setembro" data-tab="setembro">Setembro</a>
+      <a href="#outubro" data-tab="outubro">Outubro</a>
+      <a href="#ejecty" data-tab="ejecty">CRM Ejecty</a>
+      <a href="#cronograma" data-tab="cronograma">Cronograma</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+<!-- ===================== VISÃO GERAL ===================== -->
+<section class="page" id="visao" data-page="visao">
+  <div class="lead">
+    <span class="pill ok">No prazo · cadastro de produtos é o ponto crítico</span>
+    <h1>Implantação do Debx na Metalloys</h1>
+    <p>O contrato do kick-off tem <b>800h</b>. O cronograma do Debx prevê <b id="v-total">—</b>, com saldo de <b id="v-saldo">—</b>, e <b id="v-pct">—</b> das horas já foram usadas. O go-live é em <b>04/01/2027</b>; o CRM Ejecty entra antes, em <b>23/11/2026</b>.</p>
+  </div>
+
+  <div class="tiles">
+    <div class="tile"><div class="n" id="t-dias">—</div><div class="l">dias para o go-live</div><div class="s">Debx em 04/01/2027</div></div>
+    <div class="tile"><div class="n" id="t-pct">—</div><div class="l">das horas contratadas usadas</div><div class="s"><span id="t-real">—</span> de 800h do kick-off</div></div>
+    <div class="tile good" id="t-saldo-box"><div class="n" id="t-saldo">—</div><div class="l">saldo do contrato</div><div class="s"><span id="t-plan">—</span> previstas · Importação fora</div></div>
+    <div class="tile"><div class="n" id="t-os">—</div><div class="l">cobradas em OS</div><div class="s"><span id="t-nos">—</span> OSs de jul a out/26</div></div>
+    <div class="tile"><div class="n" id="t-ej">—</div><div class="l">dias para o Ejecty</div><div class="s">Go-live do CRM em 23/11</div></div>
+  </div>
+
+  <div class="block">
+    <h2>Linha do projeto</h2>
+    <p class="note">As cinco fases do kick-off da Zucchetti, de junho de 2026 a janeiro de 2027. A linha vertical marca hoje.</p>
+    <div class="card"><div class="chart" id="c-fases"></div></div>
+  </div>
+
+  <div class="grid2">
+    <div class="block">
+      <h2>Contrato x cronograma</h2>
+      <p class="note">Horas do cronograma do Debx contra as 800h contratadas. Importação é o Nexus, contrato à parte, e fica fora; o Ejecty também tem contrato próprio.</p>
+      <div class="card">
+        <div class="legend"><span><i style="background:var(--accent)"></i>Realizado</span><span><i style="background:var(--muted-bar)"></i>Planejado</span><span><i style="background:none;border-left:2px dashed var(--fg);width:2px;border-radius:0"></i>800h contratadas</span></div>
+        <div class="chart" id="c-contrato"></div>
+      </div>
+    </div>
+    <div class="block">
+      <h2>Horas cobradas por mês</h2>
+      <p class="note">Soma das OSs da Zucchetti recebidas. Outubro ainda sem a OS de 27/10.</p>
+      <div class="card"><div class="chart" id="c-mes"></div></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>Próximas agendas</h2>
+    <p class="note">Tarefas planejadas no cronograma da Zucchetti de 27/10, a partir de hoje.</p>
+    <div class="tl" id="v-prox"></div>
+  </div>
+
+  <div class="block">
+    <h2>Escopo contratado</h2>
+    <div class="card">
+      <p><b>18 módulos, 35 CNPJs, escopo aberto.</b> Se as horas não bastarem, a contratação extra precisa ser acertada antes da fase de transição operacional, ou seja, antes dos testes integrados de dezembro.</p>
+      <p class="small">Cadastros · Contábil · Fiscal · Suprimentos · Produção · Vendas · Financeiro · Estoque · Logística · Perfil · CRM · Engenharias · PCP · RH · Manutenção · Qualidade · Gestão de Projetos · Assistência Técnica</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SETEMBRO ===================== -->
+<section class="page" id="setembro" data-page="setembro" hidden>
+  <div class="lead">
+    <span class="pill plain">Mês encerrado · consolidado em 07/10/2026</span>
+    <h1>Setembro · o mês da parametrização</h1>
+    <p>Sete frentes trabalhadas, do cadastro à logística, com quatro consultores. <b>74h20</b> em 15 OSs. Oito agendas ficaram sem OS (RH, Fiscal e Comex).</p>
+  </div>
+  <div class="tiles">
+    <div class="tile"><div class="n" id="s-horas">—</div><div class="l">de consultoria</div><div class="s"><span id="s-nos">—</span> OSs recebidas</div></div>
+    <div class="tile"><div class="n">7</div><div class="l">frentes trabalhadas</div><div class="s">Do cadastro à logística</div></div>
+    <div class="tile"><div class="n">4</div><div class="l">consultores</div><div class="s">Zucchetti e parceiros</div></div>
+    <div class="tile warn"><div class="n">8</div><div class="l">agendas sem OS</div><div class="s">RH, Fiscal e Comex</div></div>
+  </div>
+  <div class="grid2">
+    <div class="block">
+      <h2>Horas por consultor</h2>
+      <div class="card"><div class="chart" id="c-cons"></div><p class="small" style="margin-top:10px">Emerson: cadastros, condições de pagamento, compras, comissões e logística. Katia: contábil e fiscal. Luciano: sinônimos entre bases e carga de cadastros. Leonardo: RH.</p></div>
+    </div>
+    <div class="block">
+      <h2>Decisões do mês</h2>
+      <div class="dec"><span class="t">Novo CRM: Mercos → Ejecty</span><span>O Mercos aumentou o valor e descumpriu o contratado. Decisão conjunta da TI com Alisson Marcelino e Mario Ogata.</span></div>
+      <div class="dec"><span class="t">Comissões especiais de Life Science</span><span>Regras repassadas pelo gestor Bruno e enviadas à Zucchetti para análise.</span></div>
+      <h2 style="font-size:22px;margin-top:6px">Destaque do mês</h2>
+      <div class="star"><b>Elisangela Santiago</b><span>Contábil · plano de contas</span></div>
+    </div>
+  </div>
+  <div class="block">
+    <h2>O que foi feito por frente</h2>
+    <div class="tl">
+      <div class="row"><div class="dt">Cadastros</div><div>Empresas, representantes e carteira de clientes, transportadoras. Sinônimos entre as bases e carga de clientes, fornecedores e transportadoras (05 a 07/09).</div></div>
+      <div class="row"><div class="dt">Contábil</div><div>Plano de contas, centro de custo (inexistente hoje), fluxo de caixa, segmentos, histórico padrão e rateios. Plano de contas seguiu com a Elisangela.</div></div>
+      <div class="row"><div class="dt">Fiscal</div><div>Treinamento das rotinas de configuração fiscal e conferência de notas de entrada. Nenhuma configuração foi cadastrada no mês.</div></div>
+      <div class="row"><div class="dt">Compras</div><div>Solicitação, concorrência, cotação, pedido e alteração de pedido; pedidos em moeda estrangeira; grupos de fornecimento.</div></div>
+      <div class="row"><div class="dt">Comercial</div><div>Formas e condições de pagamento, política comercial e regras de comissão, incluindo as exceções de Life Science.</div></div>
+      <div class="row"><div class="dt">Logística</div><div>Ordem de separação, empenho, expedição e faturamento, checklist de transporte e testes práticos pelos usuários.</div></div>
+      <div class="row"><div class="dt">RH</div><div>Treinamento inicial, competências e eSocial, eventos e rubricas. Levantada a integração com o sistema de ponto.</div></div>
+    </div>
+  </div>
+  <div class="block">
+    <h2>Levado para outubro</h2>
+    <div class="grid2">
+      <div class="blk"><b>OSs não emitidas</b><span>RH (08, 14, 15, 17 e 23/09), configurações fiscais (02/09) e Comex (21 e 24/09).</span></div>
+      <div class="blk"><b>OS 7232 em contestação</b><span>Cobrada com o registro "fiquei sem internet neste dia".</span></div>
+      <div class="blk"><b>OS 7235</b><span>Lançada em outro contrato (Standard pré-pago), a esclarecer.</span></div>
+      <div class="blk"><b>Centro de custo e configurações fiscais</b><span>Ainda pendentes no fim do mês.</span></div>
+    </div>
+  </div>
+  <div class="block">
+    <h2>OSs de setembro</h2>
+    <div class="tbox auto"><table><thead><tr><th>Data</th><th>OS</th><th>Consultor</th><th class="hide-sm">Assunto</th><th class="r">Horas</th></tr></thead><tbody id="s-oss"></tbody><tfoot><tr><td colspan="3">Total</td><td class="hide-sm"></td><td class="r" id="s-oss-tot">—</td></tr></tfoot></table></div>
+  </div>
+</section>
+
+<!-- ===================== OUTUBRO ===================== -->
+<section class="page" id="outubro" data-page="outubro" hidden>
+  <div class="lead">
+    <span class="pill plain">Mês fechado em 28/10/2026</span>
+    <h1>Outubro · treinamentos e configuração fiscal</h1>
+    <p>Treinamentos de Financeiro, Contábil, Fiscal, Ativo Fixo e da Nicomo (PCP e Qualidade). <b>128 configurações fiscais</b> criadas e NF-e liberada em homologação. O cadastro de produtos virou o bloqueio crítico: <b>6.587 produtos</b> a revisar.</p>
+  </div>
+  <div class="tiles">
+    <div class="tile"><div class="n" id="o-horas">—</div><div class="l">em OS da Katia</div><div class="s">5 OSs · falta a de 27/10</div></div>
+    <div class="tile"><div class="n">128</div><div class="l">configurações fiscais</div><div class="s">Pendentes até a reforma tributária</div></div>
+    <div class="tile warn"><div class="n">6.587</div><div class="l">produtos a revisar</div><div class="s">2.887 matéria-prima + 3.700 acabado</div></div>
+    <div class="tile warn"><div class="n" id="o-bloq">—</div><div class="l">bloqueios abertos</div><div class="s"><span id="o-crit">—</span> críticos</div></div>
+  </div>
+
+  <div class="block">
+    <h2>Bloqueios agora</h2>
+    <div class="grid3" id="o-bloqueios"></div>
+  </div>
+
+  <div class="block">
+    <h2>Destaques do mês</h2>
+    <div class="stars">
+      <div class="star"><b>Carolina e equipe</b><span>Nicomo</span></div>
+      <div class="star"><b>Elisangela</b><span>Contábil</span></div>
+      <div class="star"><b>Clayton</b><span>Fiscal</span></div>
+      <div class="star"><b>Danielle Postigo</b><span>Compras</span></div>
+      <div class="star wide"><span>Agilidade na assimilação do projeto</span><b>Cintia e Beatriz · Financeiro</b></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>Linha do tempo</h2>
+    <div class="tl">
+      <div class="row"><div class="dt">01/10</div><div><b>Kickoff do CRM Ejecty.</b> Cobrança dos testes no grupo dos líderes; Logística validada pela Rosemeire.</div></div>
+      <div class="row"><div class="dt">07/10</div><div><b>Financeiro e Contábil</b> com a Katia, 2 sessões. Fiscal ainda sem configuração.</div></div>
+      <div class="row"><div class="dt">08–09/10</div><div><b>Engenharia Nicomo</b> online com o Luciano: BOM, fracionamento, estrutura de 2 itens.</div></div>
+      <div class="row"><div class="dt">13/10</div><div><b>PCP Nicomo presencial</b> (9h–17h). Cadastro de produtos com muitos erros.</div></div>
+      <div class="row"><div class="dt">14/10</div><div><b>Produção Nicomo</b> (Alexandre) e <b>Contábil</b> (OS 7337): centros de custo e fluxo de caixa.</div></div>
+      <div class="row"><div class="dt">15/10</div><div><b>Financeiro</b> (OS 7338): adiantamentos, crédito e CNAB.</div></div>
+      <div class="row"><div class="dt">19–20/10</div><div><b>Qualidade Nicomo:</b> planos de inspeção; bug de roteiro; regras de controlados e Simproquim.</div></div>
+      <div class="row"><div class="dt">20/10</div><div><b>Fiscal</b> (OS 7403): 128 configurações por NCM e Zona Franca.</div></div>
+      <div class="row"><div class="dt">21/10</div><div><b>Fiscal e Contábil</b> (OS 7384): venda triangular 5123, serviços/REINF, NF-e em homologação.</div></div>
+      <div class="row"><div class="dt">26/10</div><div><b>Qualidade e Comercial</b> (Mario e Carol): documentos de fabricante nos anexos do Debx; inativar produtos parados há 1 ano.</div></div>
+      <div class="row"><div class="dt">27/10</div><div><b>Financeiro e Fiscal:</b> remessa e OFX travados por bugs; NFSe ligada ao pedido; nota de débito de juros e multa. <b>Comissões:</b> passam a ser sem frete (FOB).</div></div>
+      <div class="row"><div class="dt">28/10</div><div><b>Ejecty e Debx</b> (Luciano, Marcos, Marinho): Debx é fonte de preço, frete e impostos. <b>Contábil e Ativo Fixo</b> (OS 7440): divergências resolvidas; suporte no go-live definido.</div></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>Decisões do mês</h2>
+    <div class="grid3" id="o-decisoes"></div>
+  </div>
+
+  <div class="block">
+    <h2>O que foi configurado</h2>
+    <div class="grid3">
+      <div class="card"><h3>Fiscal · 20 e 21/10</h3><ul>
+        <li>128 configurações por NCM, replicadas com "Replicar configuração".</li>
+        <li>NCM 3402.11.40 extinto: passa a 3402.31.00, IPI de 3,25%.</li>
+        <li>Zona Franca: 8 cidades e 38 réplicas.</li>
+        <li>Natureza 5123/6123 (venda triangular) contabilizando e gerando financeiro.</li>
+        <li>Serviços pela LC 116 e REINF: 2 cargas a pedir.</li>
+        <li>NF-e habilitada em homologação (web service SP 4.0).</li></ul></div>
+      <div class="card"><h3>Fiscal e Financeiro · 27/10</h3><ul>
+        <li>NFSe só com pedido de compra aprovado; o sistema gera o líquido e cada imposto retido.</li>
+        <li>Impostos retidos pagos por DARF única, conferida pelo Financeiro.</li>
+        <li>Nota de débito de juros e multa configurada.</li>
+        <li>Remessa de cobrança: carteira 300 → remessa → boleto → TXT.</li>
+        <li>Crédito pela Ficha Financeira Cliente, no Contábil.</li></ul></div>
+      <div class="card"><h3>Contábil e Ativo Fixo · 28/10</h3><ul>
+        <li>Causa das divergências: revenda (tipo 600) em conta de ativo e conta de receita exigindo centro de custo.</li>
+        <li>Fluxo de ativo fixo completo, até depreciação e livro CIAP.</li>
+        <li>Construções em andamento da Nicomo: carga direta pela Zucchetti.</li>
+        <li>Zucchetti presencial na semana do go-live; força-tarefa Contábil em 04 e 05/01.</li></ul></div>
+      <div class="card"><h3>Qualidade Nicomo · 19 e 20/10</h3><ul>
+        <li>Características, instrumentos, modos e amostragem cadastrados.</li>
+        <li>Inspeção em operação intermediária resolvida.</li>
+        <li>Bug: a ordem puxa planos de todos os roteiros (job e ticket).</li>
+        <li>Bug: sem inspeção parcial no recebimento (contorno e ticket).</li>
+        <li>Novo: trigger de controlados e TXT do Simproquim.</li></ul></div>
+      <div class="card"><h3>Financeiro · 15/10</h3><ul>
+        <li>Adiantamento nasce no pedido de compra; baixa em 2 etapas.</li>
+        <li>Despesas avulsas pela tela de lançamentos financeiros.</li>
+        <li>CNAB 400 de recebimento; o de contas a pagar foi adiado.</li>
+        <li>Prioridade Atena (FIDC).</li></ul></div>
+      <div class="card"><h3>Contábil e Nicomo · 07 a 14/10</h3><ul>
+        <li>Plano Controle (1100–4999) e fluxo de caixa pela planilha da Jeane.</li>
+        <li>BOM do Molibidato e estrutura de 2 itens (big bag → embalado).</li>
+        <li>Tolerância de apontamento definida na estrutura.</li>
+        <li>Acesso remoto pela plataforma web da MDS.</li></ul></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>Horas da Katia em outubro</h2>
+    <p class="note">Horas cobradas em OS, previstas no cronograma e gravadas nas reuniões. O gravado é um piso: não conta o tempo antes de gravar nem os intervalos.</p>
+    <div class="tbox auto"><table><thead><tr><th>Dia</th><th>Área</th><th>OS</th><th class="r">Na OS</th><th class="r hide-sm">Cronograma</th><th class="r">Gravado</th></tr></thead><tbody id="o-katia"></tbody><tfoot><tr><td colspan="3">Outubro</td><td class="r" id="o-k-os">—</td><td class="r hide-sm" id="o-k-cr">—</td><td class="r" id="o-k-gr">—</td></tr></tfoot></table></div>
+  </div>
+
+  <div class="block">
+    <h2>Ações que passam para novembro</h2>
+    <div class="filters">
+      <select id="f-aarea" aria-label="Área"><option value="">Todas as áreas</option></select>
+      <select id="f-resp" aria-label="Responsável"><option value="">Todos os responsáveis</option></select>
+      <span class="count" id="n-acoes"></span>
+    </div>
+    <div class="tbox"><table><thead><tr><th>Responsável</th><th class="hide-sm">Área</th><th>Ação</th></tr></thead><tbody id="o-acoes"></tbody></table></div>
+  </div>
+</section>
+
+<!-- ===================== EJECTY ===================== -->
+<section class="page" id="ejecty" data-page="ejecty" hidden>
+  <div class="lead">
+    <span class="pill ok">No prazo · desenvolvimento e integração</span>
+    <h1>CRM Ejecty integrado ao Debx</h1>
+    <p>A Ejecty substitui o Mercos e entra em produção em <b>23/11/2026</b>, rodando em paralelo com o pré go-live do Debx. É contrato à parte, com gestão de João Dini (Metalloys) e Marcos Soares (Ejecty).</p>
+  </div>
+  <div class="tiles">
+    <div class="tile"><div class="n" id="e-dias">—</div><div class="l">dias para o go-live</div><div class="s">Ejecty em 23/11/2026</div></div>
+    <div class="tile"><div class="n">2 / 5</div><div class="l">fase em andamento</div><div class="s">Desenvolvimento e integração</div></div>
+    <div class="tile"><div class="n">4 + 1</div><div class="l">módulos + dashboard</div><div class="s">Dashboard de compras customizado</div></div>
+    <div class="tile warn"><div class="n">10/11</div><div class="l">requisitos comerciais</div><div class="s">Marcos e Marinho · frete e impostos</div></div>
+  </div>
+
+  <div class="block">
+    <h2>Fases</h2>
+    <div class="phases">
+      <div class="phase done"><b>Discovery</b><span class="small">até 5 dias · concluído</span></div>
+      <div class="phase now"><b>Desenvolvimento e integração</b><span class="small">30 dias · em andamento</span></div>
+      <div class="phase"><b>Homologação</b><span class="small">10 dias · início de novembro</span></div>
+      <div class="phase"><b>Testes</b><span class="small">5 dias</span></div>
+      <div class="phase"><b>Go-live</b><span class="small">23/11/2026</span></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>Como os sistemas conversam</h2>
+    <p class="note">Decidido em 28/10 com Luciano, Marcos e Marinho: o Debx é a fonte única dos cadastros; o Ejecty calcula a venda a partir deles.</p>
+    <div class="flow">
+      <div class="sys"><b>Debx · ERP</b><span class="small">Fonte única de produtos, tabelas de preço, estoque, frete e impostos (ICMS, PIS, COFINS, isenções do MAPA).</span></div>
+      <div class="arrows"><span>produtos · preços · estoque →</span><span>tabelas de frete e impostos →</span><span>← clientes · pedidos →</span></div>
+      <div class="sys"><b>Ejecty · CRM</b><span class="small">Vendedores, CRM, IA, catálogos e dashboard de compras. Calcula na cotação o preço final, o frete CIF, os impostos e a margem.</span></div>
+    </div>
+    <p class="small">O estoque sincroniza a cada minuto. O Ejecty lê as tabelas do Debx direto, pela integração que já existe.</p>
+  </div>
+
+  <div class="block">
+    <h2>Decisões</h2>
+    <div class="grid2">
+      <div class="dec"><span class="t">Debx é a fonte de preço, frete e impostos</span><span>O Ejecty não guarda cadastro próprio desses dados; calcula a venda a partir das tabelas do Debx.</span><span class="d">28/10</span></div>
+      <div class="dec"><span class="t">Comissão sem o frete (FOB)</span><span>Hoje a comissão sai sobre o preço CIF e infla a margem (15% no sistema contra 10% real com 5% de frete). O vendedor passa a ver na hora quanto o frete tira da comissão.</span><span class="d">27 e 28/10</span></div>
+      <div class="dec"><span class="t">Aviso de produto controlado no pedido</span><span>O Ejecty avisa no pedido; o bloqueio de fato acontece na nota do Debx, com limite por cliente e produto.</span><span class="d">20/10</span></div>
+      <div class="dec"><span class="t">Troca do Mercos pela Ejecty</span><span>O Mercos aumentou o valor e descumpriu o contratado. Decisão da TI com Alisson Marcelino e Mario Ogata.</span><span class="d">Setembro</span></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="block">
+      <h2>Andamento</h2>
+      <div class="card"><ul>
+        <li>Acesso ao servidor da Metalloys liberado e conexão com o banco testada.</li>
+        <li>Instância da Metalloys criada na plataforma Ejecty.</li>
+        <li>Em andamento: integração de clientes, produtos e preços, regras fiscais, pedidos e faturamento.</li>
+        <li>A seguir: primeira carga de dados, validação do mapeamento com a Metalloys e o dashboard de compras.</li>
+        <li>Frete: cerca de 18 cidades com frete negociado calculado pela planilha da Logística; nas demais, o vendedor digita a cotação.</li>
+      </ul><p class="small" style="margin-top:10px">Fonte: status report da Ejecty de 07/10 e reuniões de 27 e 28/10.</p></div>
+    </div>
+    <div class="block">
+      <h2>Próximos marcos</h2>
+      <div class="tl">
+        <div class="row"><div class="dt">10/11</div><div>Requisitos comerciais com Marcos e Marinho</div></div>
+        <div class="row"><div class="dt">Início/nov</div><div>Homologação (10 dias)</div></div>
+        <div class="row big"><div class="dt">23/11</div><div><b>Go-live Ejecty</b></div></div>
+        <div class="row"><div class="dt">04/01/27</div><div>Go-live Debx, fim do uso em paralelo</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>Pontos de atenção</h2>
+    <div class="grid3">
+      <div class="blk"><b>Tabelas de frete ainda não existem no Debx</b><span>Hoje o frete está numa planilha da Logística. Sem as tabelas, o Ejecty não tem de onde calcular. Luciano treina a Logística.</span></div>
+      <div class="blk"><b>Depende do cadastro de produtos</b><span>Preço, imposto e isenção saem do cadastro de produtos e clientes do Debx, que ainda está em limpeza.</span></div>
+      <div class="blk"><b>Prazo do frete</b><span>Os requisitos de frete só fecham em 10/11 e o go-live é em 23/11. Vale decidir se o cálculo de frete entra no go-live ou numa segunda fase.</span></div>
+      <div class="blk"><b>Pedidos entre 23/11 e 04/01</b><span>O ERP atual segue como oficial e o Debx roda em paralelo: definir para qual ERP vai cada pedido.</span></div>
+      <div class="blk"><b>Cadastro duplicado de clientes</b><span>Clientes podem nascer nos dois sistemas, inclusive pelo celular: definir o dono do cadastro.</span></div>
+      <div class="blk"><b>Migração do banco para Linux</b><span>A Zucchetti vai mover o banco Oracle; a conexão da integração precisará ser refeita, de preferência antes da homologação.</span></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="block">
+      <h2>Equipe</h2>
+      <div class="card"><ul>
+        <li><b>Metalloys:</b> João Dini (gestão do projeto), Alisson Marcelino e Mario Ogata (comercial), Marinho.</li>
+        <li><b>Ejecty:</b> Marcos Soares (responsável técnico), Luan Francisco (gerente de projetos), Wanderley Tavares Jr. (executivo comercial).</li>
+        <li><b>Zucchetti/Debx:</b> Luciano (tabelas de frete e impostos).</li>
+      </ul></div>
+    </div>
+    <div class="block">
+      <h2>Governança</h2>
+      <div class="card"><ul>
+        <li>Status semanal às quintas, 9h, 15 min: João e Marcos.</li>
+        <li>Comitê quinzenal às quintas, 9h, 30 min: Alisson, Mario e equipe Ejecty.</li>
+        <li>Relatório de uma página, semanal, enviado pela Ejecty.</li>
+        <li>Grupo técnico com Luciano e Marcos, criado pelo João.</li>
+      </ul></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CRONOGRAMA ===================== -->
+<section class="page" id="cronograma" data-page="cronograma" hidden>
+  <div class="lead">
+    <span class="pill plain">Cronograma Zucchetti de 27/10/2026</span>
+    <h1>Cronograma da implantação</h1>
+    <p>As <b id="c-ntar">—</b> tarefas do cronograma, com área, consultor, status e horas. As tarefas de Importação são do Nexus, contrato à parte.</p>
+  </div>
+  <div class="block">
+    <h2>Horas por mês</h2>
+    <div class="card">
+      <div class="legend"><span><i style="background:var(--accent)"></i>Realizado</span><span><i style="background:var(--muted-bar)"></i>Planejado</span></div>
+      <div class="chart" id="c-periodo"></div>
+    </div>
+  </div>
+  <div class="block">
+    <h2>Horas por área</h2>
+    <p class="note">Clique numa área para filtrar a tabela abaixo.</p>
+    <div class="card">
+      <div class="legend"><span><i style="background:var(--accent)"></i>Realizado</span><span><i style="background:var(--muted-bar)"></i>Planejado</span></div>
+      <div class="chart" id="c-area"></div>
+    </div>
+  </div>
+  <div class="block" id="tarefas">
+    <h2>Tarefas</h2>
+    <div class="filters">
+      <select id="f-area" aria-label="Área"><option value="">Todas as áreas</option></select>
+      <select id="f-cons" aria-label="Consultor"><option value="">Todos os consultores</option></select>
+      <select id="f-status" aria-label="Status"><option value="">Todos os status</option><option>Realizado</option><option>Planejado</option></select>
+      <input type="search" id="f-q" placeholder="Buscar assunto ou key user" aria-label="Buscar">
+      <button class="clear" id="f-clear" type="button">Limpar filtros</button>
+    </div>
+    <div class="count" id="n-tar"></div>
+    <div class="tbox"><table><thead><tr><th>Código</th><th>Data</th><th>Área</th><th>Assunto</th><th class="hide-sm">Consultor</th><th>Status</th><th class="r">Horas</th></tr></thead><tbody id="t-tar"></tbody></table></div>
+  </div>
+</section>
+
+</main>
+<footer><div class="wrap">Fontes: kick-off Zucchetti (16/06/2026), cronograma Zucchetti (27/10/2026), OSs da Zucchetti, gravações das reuniões de outubro e status reports do Ejecty. Posição em 29/10/2026 · João Dini, TI Grupo Metalloys.</div></footer>
+
+<script id="data" type="application/json">{"cronograma": [{"codigo": "MTL-001", "fase": "Mapeamento", "area": "Todas", "assunto": "Mapeamento de processos", "consultor": "Emerson", "key_users": "João Dini", "status": "Realizado", "data": "2026-07-06", "periodo": "2026-07", "horas": 8, "observacao": ""}, {"codigo": "MTL-002", "fase": "Mapeamento", "area": "Todas", "assunto": "Mapeamento de processos", "consultor": "Emerson", "key_users": "João Dini", "status": "Realizado", "data": "2026-07-07", "periodo": "2026-07", "horas": 7, "observacao": ""}, {"codigo": "MTL-003", "fase": "Mapeamento", "area": "Todas", "assunto": "Mapeamento de processos", "consultor": "Emerson", "key_users": "João Dini", "status": "Realizado", "data": "2026-07-08", "periodo": "2026-07", "horas": 6, "observacao": ""}, {"codigo": "MTL-004", "fase": "Instalação", "area": "Todas", "assunto": "Instalação do Banco de Dados", "consultor": "Zucchetti", "key_users": "", "status": "Realizado", "data": "2026-08-25", "periodo": "2026-08", "horas": 13.67, "observacao": "OS 7237 E OS 7238"}, {"codigo": "MTL-005", "fase": "Carga de Dados", "area": "Todas", "assunto": "Elaboração de Planilha de Empresas para Carga de dados", "consultor": "", "key_users": "João Dini", "status": "Realizado", "data": "2026-08-27", "periodo": "2026-08", "horas": null, "observacao": "Conforme planilha padrão enviada"}, {"codigo": "MTL-006", "fase": "Carga de Dados", "area": "Todas", "assunto": "Elaboração de Planilha de Materiais para Carga de dados", "consultor": "", "key_users": "João Dini", "status": "Realizado", "data": "2026-08-27", "periodo": "2026-08", "horas": null, "observacao": "Conforme planilha padrão enviada"}, {"codigo": "MTL-007", "fase": "Treinamento", "area": "Cadastros", "assunto": "Cadastro de Perfil e Usuários", "consultor": "Emerson", "key_users": "João Dini", "status": "Realizado", "data": "2026-08-28", "periodo": "2026-08", "horas": 2.5, "observacao": "OS 7204"}, {"codigo": "MTL-008", "fase": "Carga de Dados", "area": "Todas", "assunto": "Carga de Cadastro de Empresas", "consultor": "Luciano", "key_users": "João Dini", "status": "Realizado", "data": "2026-08-29", "periodo": "2026-08", "horas": 6.5, "observacao": "OS 7239"}, {"codigo": "MTL-009", "fase": "Carga de Dados", "area": "Todas", "assunto": "Carga de Cadastro de Produtos", "consultor": "Emerson", "key_users": "João Dini", "status": "Realizado", "data": "2026-08-29", "periodo": "2026-08", "horas": 6, "observacao": ""}, {"codigo": "MTL-010", "fase": "Treinamento", "area": "Cadastros", "assunto": "Cadastro de Materiais / Cadastro de Grupos de Produtos / Cadastro de Complementos de Materiais", "consultor": "Emerson", "key_users": "Mario Ogata, Alisson Marcelino, Rosemeire, Jeane e Caroline Mota", "status": "Realizado", "data": "2026-08-31", "periodo": "2026-08", "horas": 6.25, "observacao": "OS 7205"}, {"codigo": "MTL-011", "fase": "Treinamento", "area": "Cadastros", "assunto": "Cadastro de Empresas / Cadastro de Representantes / Cadastro de Transportadoras", "consultor": "Emerson", "key_users": "Mario Ogata, Alisson Marcelino, Rosemeire, Jeane e Caroline Mota", "status": "Realizado", "data": "2026-09-01", "periodo": "2026-09", "horas": 4.5, "observacao": "OS 7206"}, {"codigo": "MTL-012", "fase": "Treinamento", "area": "Cadastros", "assunto": "Cadastro de Forma e Condição de Pagamento / Cadastros Diversos", "consultor": "Emerson", "key_users": "Mario Ogata, Alisson Marcelino, Rosemeire, Jeane e Caroline Mota", "status": "Realizado", "data": "2026-09-02", "periodo": "2026-09", "horas": 5, "observacao": "OS 7207"}, {"codigo": "MTL-013", "fase": "Treinamento", "area": "Contábil", "assunto": "Planos e Tabelas / Cadastros Básicos / Centros de Custo / Rateios / Razões /Segmento Conciliações / Balancetes /Lançamentos", "consultor": "Katia", "key_users": "Elisangela", "status": "Realizado", "data": "2026-09-03", "periodo": "2026-09", "horas": 7, "observacao": "OS 7231"}, {"codigo": "MTL-014", "fase": "Treinamento", "area": "RH", "assunto": "Cadastros Gerais / ponto /Segurança e Medicina / Férias / Desligamentos / Dissidios e Acordos / Planos de Sáude / Processos Trabalhistas / ESocial", "consultor": "Leo", "key_users": "Sabrina e Jeane", "status": "Realizado", "data": "2026-09-08", "periodo": "2026-09", "horas": 8, "observacao": "OS7273"}, {"codigo": "MTL-015", "fase": "Treinamento", "area": "Suprimentos", "assunto": "Solicitação de Compra / Concorrência / Cotações / Pedido de Compra / Alteração de Pedido de Compra (APC) / Grupo de Fornecimento / Faixas de Aprovação", "consultor": "Emerson", "key_users": "Matheus, Mario e Mariana", "status": "Realizado", "data": "2026-09-08", "periodo": "2026-09", "horas": 3, "observacao": "OS 7227"}, {"codigo": "MTL-016", "fase": "Treinamento", "area": "Fiscal", "assunto": "Configurações Fiscais / Lançamentos Contábeis", "consultor": "Katia", "key_users": "Gislaine/Ana/Clayton/Ana/Vanessa", "status": "Realizado", "data": "2026-09-09", "periodo": "2026-09", "horas": 8, "observacao": "OS 7232"}, {"codigo": "MTL-017", "fase": "Treinamento", "area": "RH", "assunto": "Cadastros Gerais / ponto /Segurança e Medicina / Férias / Desligamentos / Dissidios e Acordos / Planos de Sáude / Processos Trabalhistas / ESocial", "consultor": "Leo", "key_users": "Sabrina e Jeane", "status": "Realizado", "data": "2026-09-09", "periodo": "2026-09", "horas": 8, "observacao": "OS7274"}, {"codigo": "MTL-018", "fase": "Treinamento", "area": "Suprimentos", "assunto": "Solicitação de Compra / Concorrência / Cotações / Pedido de Compra / Alteração de Pedido de Compra (APC) / Grupo de Fornecimento / Faixas de Aprovação", "consultor": "Emerson", "key_users": "Matheus, Mario e Mariana", "status": "Realizado", "data": "2026-09-09", "periodo": "2026-09", "horas": 2, "observacao": "OS 7228"}, {"codigo": "MTL-019", "fase": "Treinamento", "area": "Fiscal", "assunto": "Entrada de Notas / Conferência de Notas", "consultor": "Katia", "key_users": "Gislaine/Ana/Clayton/Ana/Vanessa", "status": "Realizado", "data": "2026-09-10", "periodo": "2026-09", "horas": 8, "observacao": "OS 7233"}, {"codigo": "MTL-020", "fase": "Treinamento", "area": "RH", "assunto": "Cadastros Gerais / ponto /Segurança e Medicina / Férias / Desligamentos / Dissidios e Acordos / Planos de Sáude / Processos Trabalhistas / ESocial", "consultor": "Leo", "key_users": "Sabrina e Jeane", "status": "Realizado", "data": "2026-09-14", "periodo": "2026-09", "horas": 8, "observacao": ""}, {"codigo": "MTL-021", "fase": "Treinamento", "area": "Vendas", "assunto": "Politica comercial / Tabelas de Preço / Formas e Condições de Pagamento / Comissões / Pedido de Venda / Alteração de Pedido de Venda", "consultor": "Alexandre/Emerson", "key_users": "Mario Ogata, Alisson Marcelino, Iara", "status": "Realizado", "data": "2026-09-15", "periodo": "2026-09", "horas": 2, "observacao": "OS 7303"}, {"codigo": "MTL-022", "fase": "Treinamento", "area": "RH", "assunto": "Cadastros Gerais / ponto /Segurança e Medicina / Férias / Desligamentos / Dissidios e Acordos / Planos de Sáude / Processos Trabalhistas / ESocial", "consultor": "Leo", "key_users": "Sabrina e Jeane", "status": "Realizado", "data": "2026-09-15", "periodo": "2026-09", "horas": 8, "observacao": ""}, {"codigo": "MTL-023", "fase": "Treinamento", "area": "Logistica / Estoque", "assunto": "Ordem de Separação / Separação por Ordem / Transferência de Materiais, Saídas de Consumo / locais de Estoque / Controle de Estoque", "consultor": "Alexandre/Emerson", "key_users": "Rosemeire, Guilherme, Renato e Elisangela", "status": "Realizado", "data": "2026-09-17", "periodo": "2026-09", "horas": 5.17, "observacao": "OS 7305"}, {"codigo": "MTL-024", "fase": "Treinamento", "area": "Logistica / Estoque", "assunto": "Ordem de Separação / Separação por Ordem / Transferência de Materiais, Saídas de Consumo / locais de Estoque / Controle de Estoque", "consultor": "Alexandre/Emerson", "key_users": "Rosemeire, Guilherme, Renato e Elisangela", "status": "Realizado", "data": "2026-09-18", "periodo": "2026-09", "horas": 3, "observacao": "OS 7304"}, {"codigo": "MTL-025", "fase": "Treinamento", "area": "Fiscal", "assunto": "Entrada de Notas / Conferência de Notas/Configuração Fiscal/Natureza da Operação", "consultor": "Katia", "key_users": "Gislaine/Ana/Clayton/Ana/Vanessa", "status": "Realizado", "data": "2026-09-18", "periodo": "2026-09", "horas": 6.5, "observacao": "OS7235"}, {"codigo": "MTL-026", "fase": "Treinamento", "area": "Financeiro", "assunto": "Contas à Receber / Contas à Pagar / Lançamentos Financeiros / Bancos / Despesas de Viagens/Baixas/Bancos/Extratos Bancário", "consultor": "Katia", "key_users": "Cintia /Jeane/Beatriz/Elisagenla", "status": "Realizado", "data": "2026-10-07", "periodo": "2026-10", "horas": 8, "observacao": "OS 7334"}, {"codigo": "MTL-027", "fase": "Treinamento", "area": "Engenharia", "assunto": "Roteiros de produção / Notificações de Processo / Cadastros Gerais", "consultor": "Luciano", "key_users": "Caroline e Ruti", "status": "Realizado", "data": "2026-10-08", "periodo": "2026-10", "horas": 7, "observacao": "Carregado os grupos de produtos durante intervalo do treinamento."}, {"codigo": "MTL-028", "fase": "Treinamento", "area": "Engenharia", "assunto": "Roteiros de produção / Notificações de Processo / Cadastros Gerais", "consultor": "Alexandre", "key_users": "Caroline e Ruti", "status": "Realizado", "data": "2026-10-13", "periodo": "2026-10", "horas": 8, "observacao": ""}, {"codigo": "MTL-029", "fase": "Treinamento", "area": "Contábil", "assunto": "Planos e Tabelas / Cadastros Básicos /Cadastro Plano Contábil/Plano Controle/Cadastro Provisões RH/Cadastro Historico/ Centros de Custo / Rateios / Razões / Conciliações / Fechamento / Balancetes / Auditoria / Lançamentos", "consultor": "Katia", "key_users": "Elisangela", "status": "Realizado", "data": "2026-10-14", "periodo": "2026-10", "horas": 8, "observacao": "OS 7337"}, {"codigo": "MTL-030", "fase": "Treinamento", "area": "Produção", "assunto": "Geração de Ordens de Fabricacao e apontamentos de producao", "consultor": "Alexandre", "key_users": "Caroline e Ruti", "status": "Realizado", "data": "2026-10-14", "periodo": "2026-10", "horas": 1, "observacao": ""}, {"codigo": "MTL-031", "fase": "Treinamento", "area": "Financeiro", "assunto": "Contas à Receber / Contas à Pagar /Adiantamentos/Baixas Lançamentos Financeiros / Bancos / Analise de Credito", "consultor": "Katia", "key_users": "William/Beatriz/Elisangela", "status": "Realizado", "data": "2026-10-15", "periodo": "2026-10", "horas": 8, "observacao": "OS 7338"}, {"codigo": "MTL-032", "fase": "Treinamento", "area": "Qualidade", "assunto": "Cadstros Básico da Qualidade, Planos de Inspeção, Inspeção de Recebimento e Processos", "consultor": "Alexandre", "key_users": "Caroline e Ruti", "status": "Realizado", "data": "2026-10-19", "periodo": "2026-10", "horas": 4.5, "observacao": ""}, {"codigo": "MTL-033", "fase": "Treinamento", "area": "Fiscal", "assunto": "Configurações Fiscais / Lançamentos Contábeis", "consultor": "Katia", "key_users": "Gislaine/Ana/Clayton/Ana/Vanessa", "status": "Realizado", "data": "2026-10-20", "periodo": "2026-10", "horas": 8, "observacao": "OS 7403"}, {"codigo": "MTL-034", "fase": "Treinamento", "area": "Qualidade", "assunto": "Plano de Inspeção e Processos de Inspeção", "consultor": "Luciano", "key_users": "Caroline e Ruti", "status": "Realizado", "data": "2026-10-20", "periodo": "2026-10", "horas": 8, "observacao": ""}, {"codigo": "MTL-035", "fase": "Treinamento", "area": "Fiscal", "assunto": "Configurações Fiscais / Lançamentos Contábeis", "consultor": "Katia", "key_users": "Gislaine/Ana/Clayton/Ana/Vanessa", "status": "Realizado", "data": "2026-10-21", "periodo": "2026-10", "horas": 8, "observacao": "OS 7384"}, {"codigo": "MTL-036", "fase": "Treinamento", "area": "Financeiro", "assunto": "CNAB/Fluxo de Caixa/Lançamentos Financeiros e demais rotinas", "consultor": "Katia", "key_users": "William/Beatriz/Elisangela", "status": "Planejado", "data": "2026-10-27", "periodo": "2026-10", "horas": 8, "observacao": ""}, {"codigo": "MTL-037", "fase": "Customização", "area": "Itens especiais", "assunto": "Criação de customização de controle de itens especiais", "consultor": "", "key_users": "", "status": "Planejado", "data": "2026-10-27", "periodo": "2026-10", "horas": 30, "observacao": "Prazo de entrega: 27/10/2026. Responsável a definir."}, {"codigo": "MTL-038", "fase": "Treinamento", "area": "Contábil", "assunto": "Ativo Fixo", "consultor": "Katia", "key_users": "Elisangela", "status": "Planejado", "data": "2026-10-28", "periodo": "2026-10", "horas": 8, "observacao": ""}, {"codigo": "MTL-042", "fase": "Customização", "area": "Produção", "assunto": "Criação de OF personalizada", "consultor": "", "key_users": "", "status": "Planejado", "data": "2026-10-30", "periodo": "2026-10", "horas": 20, "observacao": "Prazo de entrega: 30/10/2026. Responsável a definir."}, {"codigo": "MTL-043", "fase": "Integração de Bases", "area": "todas", "assunto": "Automátizar envio de pedidos e entradas de NF entre as empresas do grupo", "consultor": "Emerson/Luciano", "key_users": "", "status": "Planejado", "data": null, "periodo": "2026-11", "horas": 32, "observacao": "Será feito durante o periodo de treinamentos, antes do pré go-live"}, {"codigo": "MTL-044", "fase": "Treinamento", "area": "Contábil", "assunto": "Rotinas de Fechamento e Analises do Balacente", "consultor": "Katia", "key_users": "Elisangela", "status": "Planejado", "data": "2026-11-04", "periodo": "2026-11", "horas": 8, "observacao": ""}, {"codigo": "MTL-045", "fase": "Treinamento", "area": "Contábil", "assunto": "Elaboração dos processos para imput do Saldo Contábil", "consultor": "Katia", "key_users": "Elisangela", "status": "Planejado", "data": "2026-11-05", "periodo": "2026-11", "horas": 8, "observacao": ""}, {"codigo": "MTL-047", "fase": "Treinamento", "area": "Estoque", "assunto": "Cotia — Expedição e Estoque", "consultor": "Luciano", "key_users": "", "status": "Planejado", "data": "2026-11-05", "periodo": "2026-11", "horas": null, "observacao": "Dia todo. Horas a definir."}, {"codigo": "MTL-049", "fase": "Treinamento", "area": "Estoque", "assunto": "Cotia — Expedição e Estoque", "consultor": "Luciano", "key_users": "", "status": "Planejado", "data": "2026-11-09", "periodo": "2026-11", "horas": null, "observacao": "Dia todo. Horas a definir."}, {"codigo": "MTL-050", "fase": "Treinamento", "area": "Fiscal", "assunto": "Emissão de Notas (Saida, entrada, Debito, Credito, Complemento, Carta de Correção)/Reforma Tributária", "consultor": "Katia", "key_users": "Gislaine/Ana/Clayton/Ana/Vanessa", "status": "Planejado", "data": "2026-11-11", "periodo": "2026-11", "horas": 8, "observacao": ""}, {"codigo": "MTL-051", "fase": "Treinamento", "area": "Importação", "assunto": "Treinamento — Cadastros básicos do Sistema de Importação", "consultor": "Luciano", "key_users": "", "status": "Planejado", "data": "2026-11-11", "periodo": "2026-11", "horas": 4, "observacao": "08h30–12h30"}, {"codigo": "MTL-052", "fase": "Treinamento", "area": "Fiscal", "assunto": "Emissão de Notas (Saida, entrada, Debito, Credito, Complemento, Carta de Correção)", "consultor": "Katia", "key_users": "Gislaine/Ana/Clayton/Ana/Vanessa", "status": "Planejado", "data": "2026-11-12", "periodo": "2026-11", "horas": 8, "observacao": ""}, {"codigo": "MTL-054", "fase": "Treinamento", "area": "Manutenção", "assunto": "Treinamento de manutenção", "consultor": "Emerson", "key_users": "", "status": "Planejado", "data": "2026-11-12", "periodo": "2026-11", "horas": null, "observacao": "Remoto. Horário e duração a definir."}, {"codigo": "MTL-055", "fase": "Treinamento", "area": "Manutenção", "assunto": "Recursos / Plano de Manutenção Ordens de Serviço / Cadastros Gerais", "consultor": "Alexandre/luciano", "key_users": "Caroline e Ruti", "status": "Planejado", "data": "2026-11-13", "periodo": "2026-11", "horas": 8, "observacao": ""}, {"codigo": "MTL-056", "fase": "Treinamento", "area": "Importação", "assunto": "Treinamento — Parâmetros contábeis do Sistema de Importação", "consultor": "Luciano", "key_users": "", "status": "Planejado", "data": "2026-11-13", "periodo": "2026-11", "horas": 4, "observacao": "08h30–12h30"}, {"codigo": "MTL-058", "fase": "Treinamento", "area": "Manutenção", "assunto": "Treinamento de manutenção", "consultor": "Emerson", "key_users": "", "status": "Planejado", "data": "2026-11-13", "periodo": "2026-11", "horas": null, "observacao": "Remoto. Horário e duração a definir."}, {"codigo": "MTL-059", "fase": "Treinamento", "area": "Fiscal", "assunto": "Arquivos Magnéticos", "consultor": "Katia", "key_users": "Gislaine/Ana/Clayton/Ana/Vanessa", "status": "Planejado", "data": "2026-11-18", "periodo": "2026-11", "horas": 6.5, "observacao": ""}, {"codigo": "MTL-060", "fase": "Treinamento", "area": "Importação", "assunto": "Treinamento — Cadastro completo do Sistema de Importação", "consultor": "Luciano", "key_users": "", "status": "Planejado", "data": "2026-11-18", "periodo": "2026-11", "horas": null, "observacao": "Dia todo. Horas a definir."}, {"codigo": "MTL-061", "fase": "Treinamento", "area": "Financeiro", "assunto": "Carga Contas a Pagar e Receber e demais duvidas dos treinamentos aplicados.", "consultor": "Katia", "key_users": "William/Beatriz/Elisangela", "status": "Planejado", "data": "2026-11-19", "periodo": "2026-11", "horas": 8, "observacao": ""}, {"codigo": "MTL-062", "fase": "Treinamento", "area": "Importação", "assunto": "Treinamento — Adiantamentos, pagamentos e variação cambial no Sistema de Importação", "consultor": "Luciano", "key_users": "", "status": "Planejado", "data": "2026-11-23", "periodo": "2026-11", "horas": null, "observacao": "Dia todo. Horas a definir."}, {"codigo": "MTL-063", "fase": "Treinamento", "area": "Financeiro", "assunto": "Analise de Carga de mais duvidas", "consultor": "Katia", "key_users": "Gislaine/Ana/Clayton/Ana/Vanessa", "status": "Planejado", "data": "2026-11-25", "periodo": "2026-11", "horas": 8, "observacao": ""}, {"codigo": "MTL-064", "fase": "Treinamento", "area": "PCP", "assunto": "Treinamento MRP", "consultor": "Luciano", "key_users": "", "status": "Planejado", "data": "2026-11-25", "periodo": "2026-11", "horas": null, "observacao": "Dia todo. Horas a definir."}, {"codigo": "MTL-057", "fase": "Treinamento", "area": "Suprimentos", "assunto": "Avaliação de Fornecedores", "consultor": "Luciano", "key_users": "", "status": "Planejado", "data": "2026-11-27", "periodo": "2026-11", "horas": 4, "observacao": "14h–18h. Horário corrigido."}, {"codigo": "MTL-065", "fase": "Customização", "area": "Importação", "assunto": "Customizações diversas no processo de importação", "consultor": "Luciano", "key_users": "", "status": "Planejado", "data": "2026-11-30", "periodo": "2026-11", "horas": 100, "observacao": "Prazo de entrega: 30/11/2026. Responsável a definir."}, {"codigo": "MTL-066", "fase": "Pré go-live", "area": "Todas", "assunto": "Pré go-live  Testes integrados e correções", "consultor": "", "key_users": "", "status": "Planejado", "data": null, "periodo": "2026-12", "horas": 8, "observacao": ""}, {"codigo": "MTL-067", "fase": "Pré go-live", "area": "Todas", "assunto": "Pré go-live  Testes integrados e correções", "consultor": "", "key_users": "", "status": "Planejado", "data": null, "periodo": "2026-12", "horas": 8, "observacao": ""}, {"codigo": "MTL-068", "fase": "Pré go-live", "area": "Todas", "assunto": "Pré go-live  Testes integrados e correções", "consultor": "", "key_users": "", "status": "Planejado", "data": null, "periodo": "2026-12", "horas": 8, "observacao": ""}, {"codigo": "MTL-069", "fase": "Pré go-live", "area": "Todas", "assunto": "Pré go-live  Testes integrados e correções", "consultor": "", "key_users": "", "status": "Planejado", "data": null, "periodo": "2026-12", "horas": 8, "observacao": ""}, {"codigo": "MTL-070", "fase": "Pré go-live", "area": "Todas", "assunto": "Pré go-live  Testes integrados e correções", "consultor": "", "key_users": "", "status": "Planejado", "data": null, "periodo": "2026-12", "horas": 8, "observacao": ""}, {"codigo": "MTL-071", "fase": "Pré go-live", "area": "Todas", "assunto": "Pré go-live  Testes integrados e correções", "consultor": "", "key_users": "", "status": "Planejado", "data": null, "periodo": "2026-12", "horas": 8, "observacao": ""}, {"codigo": "MTL-072", "fase": "Pré go-live", "area": "Todas", "assunto": "Pré go-live  Testes integrados e correções", "consultor": "", "key_users": "", "status": "Planejado", "data": null, "periodo": "2026-12", "horas": 8, "observacao": ""}, {"codigo": "MTL-073", "fase": "Pré go-live", "area": "Todas", "assunto": "Pré go-live  Testes integrados e correções", "consultor": "", "key_users": "", "status": "Planejado", "data": null, "periodo": "2026-12", "horas": 8, "observacao": ""}, {"codigo": "MTL-074", "fase": "Pré go-live", "area": "Todas", "assunto": "Pré go-live  Testes integrados e correções", "consultor": "", "key_users": "", "status": "Planejado", "data": null, "periodo": "2026-12", "horas": 8, "observacao": ""}, {"codigo": "MTL-075", "fase": "Pré go-live", "area": "Todas", "assunto": "Pré go-live  Testes integrados e correções", "consultor": "", "key_users": "", "status": "Planejado", "data": null, "periodo": "2026-12", "horas": 8, "observacao": ""}, {"codigo": "MTL-076", "fase": "Pré go-live", "area": "Todas", "assunto": "Pré go-live  Testes integrados e correções", "consultor": "", "key_users": "", "status": "Planejado", "data": null, "periodo": "2026-12", "horas": 8, "observacao": ""}, {"codigo": "MTL-077", "fase": "Pré go-live", "area": "Todas", "assunto": "Pré go-live  Testes integrados e correções", "consultor": "", "key_users": "", "status": "Planejado", "data": null, "periodo": "2026-12", "horas": 8, "observacao": ""}, {"codigo": "MTL-078", "fase": "Pré go-live", "area": "Todas", "assunto": "Pré go-live  Testes integrados e correções", "consultor": "", "key_users": "", "status": "Planejado", "data": null, "periodo": "2026-12", "horas": 8, "observacao": ""}, {"codigo": "MTL-079", "fase": "Pré go-live", "area": "Todas", "assunto": "Pré go-live  Testes integrados e correções", "consultor": "", "key_users": "", "status": "Planejado", "data": null, "periodo": "2026-12", "horas": 8, "observacao": ""}, {"codigo": "MTL-080", "fase": "Pré go-live", "area": "Todas", "assunto": "Pré go-live  Testes integrados e correções", "consultor": "", "key_users": "", "status": "Planejado", "data": null, "periodo": "2026-12", "horas": 8, "observacao": ""}, {"codigo": "MTL-081", "fase": "Pré go-live", "area": "Todas", "assunto": "Pré go-live  Testes integrados e correções", "consultor": "", "key_users": "", "status": "Planejado", "data": null, "periodo": "2026-12", "horas": 8, "observacao": ""}, {"codigo": "MTL-082", "fase": "Pré go-live", "area": "Todas", "assunto": "Pré go-live  Testes integrados e correções", "consultor": "", "key_users": "", "status": "Planejado", "data": null, "periodo": "2026-12", "horas": 8, "observacao": ""}, {"codigo": "MTL-083", "fase": "Pré go-live", "area": "Todas", "assunto": "Pré go-live  Testes integrados e correções", "consultor": "", "key_users": "", "status": "Planejado", "data": null, "periodo": "2026-12", "horas": 8, "observacao": ""}, {"codigo": "MTL-084", "fase": "Treinamento", "area": "Todas", "assunto": "Relatórios customizados de implantação", "consultor": "Emerson", "key_users": "", "status": "Planejado", "data": null, "periodo": "2026-12", "horas": 48, "observacao": "conforme necessidade"}, {"codigo": "MTL-085", "fase": "Carga de Dados", "area": "Todas", "assunto": "Pós go-live (Saldo de implantação - Estoque, Contas à Pagar e Contas à Receber)", "consultor": "Emerson/Luciano", "key_users": "João Dini", "status": "Planejado", "data": "2027-01-04", "periodo": "2027-01", "horas": 24, "observacao": "Conforme planilha padrão à ser enviada"}, {"codigo": "MTL-086", "fase": "Carga de Dados", "area": "Todas", "assunto": "Pós go-live (Saldo de implantação - Estoque, Contas à Pagar e Contas à Receber)", "consultor": "", "key_users": "", "status": "Planejado", "data": null, "periodo": "2027-01", "horas": 8, "observacao": ""}, {"codigo": "MTL-087", "fase": "Go-live", "area": "Todas", "assunto": "Monitoramento dos processos", "consultor": "", "key_users": "", "status": "Planejado", "data": null, "periodo": "2027-01", "horas": 8, "observacao": ""}, {"codigo": "MTL-088", "fase": "Go-live", "area": "Todas", "assunto": "Monitoramento dos processos", "consultor": "", "key_users": "", "status": "Planejado", "data": null, "periodo": "2027-01", "horas": 8, "observacao": ""}, {"codigo": "MTL-089", "fase": "Go-live", "area": "Todas", "assunto": "Monitoramento dos processos", "consultor": "", "key_users": "", "status": "Planejado", "data": null, "periodo": "2027-01", "horas": 8, "observacao": ""}, {"codigo": "MTL-090", "fase": "Go-live", "area": "Todas", "assunto": "Monitoramento dos processos", "consultor": "", "key_users": "", "status": "Planejado", "data": null, "periodo": "2027-01", "horas": 8, "observacao": ""}, {"codigo": "MTL-091", "fase": "Go-live", "area": "Todas", "assunto": "Monitoramento dos processos", "consultor": "", "key_users": "", "status": "Planejado", "data": null, "periodo": "2027-01", "horas": 8, "observacao": ""}, {"codigo": "MTL-092", "fase": "Go-live", "area": "Todas", "assunto": "Monitoramento dos processos", "consultor": "", "key_users": "", "status": "Planejado", "data": null, "periodo": "2027-01", "horas": 8, "observacao": ""}, {"codigo": "MTL-093", "fase": "Go-live", "area": "Todas", "assunto": "Monitoramento dos processos", "consultor": "", "key_users": "", "status": "Planejado", "data": null, "periodo": "2027-01", "horas": 8, "observacao": ""}, {"codigo": "MTL-094", "fase": "Go-live", "area": "Todas", "assunto": "Monitoramento dos processos", "consultor": "", "key_users": "", "status": "Planejado", "data": null, "periodo": "2027-01", "horas": 8, "observacao": ""}, {"codigo": "MTL-095", "fase": "Go-live", "area": "Todas", "assunto": "Monitoramento dos processos", "consultor": "", "key_users": "", "status": "Planejado", "data": null, "periodo": "2027-01", "horas": 8, "observacao": ""}, {"codigo": "MTL-096", "fase": "Go-live", "area": "Todas", "assunto": "Monitoramento dos processos", "consultor": "", "key_users": "", "status": "Planejado", "data": null, "periodo": "2027-01", "horas": 8, "observacao": ""}, {"codigo": "MTL-097", "fase": "Go-live", "area": "Todas", "assunto": "Monitoramento dos processos", "consultor": "", "key_users": "", "status": "Planejado", "data": null, "periodo": "2027-01", "horas": 8, "observacao": ""}, {"codigo": "MTL-098", "fase": "Go-live", "area": "Todas", "assunto": "Monitoramento dos processos", "consultor": "", "key_users": "", "status": "Planejado", "data": null, "periodo": "2027-01", "horas": 8, "observacao": ""}, {"codigo": "MTL-099", "fase": "Go-live", "area": "Todas", "assunto": "Monitoramento dos processos", "consultor": "", "key_users": "", "status": "Planejado", "data": null, "periodo": "2027-01", "horas": 8, "observacao": ""}, {"codigo": "MTL-100", "fase": "Go-live", "area": "Todas", "assunto": "Monitoramento dos processos", "consultor": "", "key_users": "", "status": "Planejado", "data": null, "periodo": "2027-01", "horas": 8, "observacao": ""}, {"codigo": "MTL-101", "fase": "Go-live", "area": "Todas", "assunto": "Monitoramento dos processos", "consultor": "", "key_users": "", "status": "Planejado", "data": null, "periodo": "2027-01", "horas": 8, "observacao": ""}, {"codigo": "MTL-102", "fase": "Go-live", "area": "Todas", "assunto": "Monitoramento dos processos", "consultor": "", "key_users": "", "status": "Planejado", "data": null, "periodo": "2027-01", "horas": 8, "observacao": ""}, {"codigo": "MTL-103", "fase": "Go-live", "area": "Todas", "assunto": "Monitoramento dos processos", "consultor": "", "key_users": "", "status": "Planejado", "data": null, "periodo": "2027-01", "horas": 8, "observacao": ""}, {"codigo": "MTL-104", "fase": "Go-live", "area": "Todas", "assunto": "Monitoramento dos processos", "consultor": "", "key_users": "", "status": "Planejado", "data": null, "periodo": "2027-01", "horas": 8, "observacao": ""}, {"codigo": "MTL-105", "fase": "Fechamentos", "area": "Todas", "assunto": "Fechamentos", "consultor": "Katia", "key_users": "Renato, Elisangela e Jeane", "status": "Planejado", "data": null, "periodo": "2027-02", "horas": 8, "observacao": "definir data após primeiro mês de Go-live"}, {"codigo": "MTL-106", "fase": "Fechamentos", "area": "Todas", "assunto": "Fechamentos", "consultor": "Katia", "key_users": "Renato, Elisangela e Jeane", "status": "Planejado", "data": null, "periodo": "2027-02", "horas": 8, "observacao": "definir data após primeiro mês de Go-live"}, {"codigo": "MTL-107", "fase": "Treinamento", "area": "PCP / Produção", "assunto": "Programação da Produção / Emissão de Ordem de Fabricação / Apontamentos de Produção", "consultor": "Alexandre/luciano", "key_users": "Caroline e Ruti", "status": "Planejado", "data": null, "periodo": null, "horas": 8, "observacao": ""}, {"codigo": "MTL-108", "fase": "Treinamento", "area": "Vendas", "assunto": "Politica comercial / Tabelas de Preço / Formas e Condições de Pagamento / Comissões / Pedido de Venda / Alteração de Pedido de Venda", "consultor": "Alexandre/Emerson", "key_users": "Mario Ogata, Alisson Marcelino, Iara", "status": "Planejado", "data": null, "periodo": null, "horas": 8, "observacao": "Aguardar definição com Mercus"}], "oss": [{"os": "0006980", "data": "2026-07-06", "mes": "2026-07", "consultor": "Emerson Carlos Da Silva", "assunto": "Mapeamento de processos", "horas": 8.0}, {"os": "0006981", "data": "2026-07-07", "mes": "2026-07", "consultor": "Emerson Carlos Da Silva", "assunto": "Mapeamento de processos", "horas": 6.92}, {"os": "0006982", "data": "2026-07-08", "mes": "2026-07", "consultor": "Emerson Carlos Da Silva", "assunto": "Mapeamento de processos (Mogi Guaçu)", "horas": 5.83}, {"os": "0007204", "data": "2026-08-28", "mes": "2026-08", "consultor": "Emerson Carlos Da Silva", "assunto": "Cadastro de perfil e usuários", "horas": 2.5}, {"os": "0007205", "data": "2026-08-31", "mes": "2026-08", "consultor": "Emerson Carlos Da Silva", "assunto": "Cadastro de perfil e usuários", "horas": 6.42}, {"os": "0007206", "data": "2026-09-01", "mes": "2026-09", "consultor": "Emerson Carlos Da Silva", "assunto": "Cadastro de empresas / representantes / transportadoras", "horas": 4.5}, {"os": "0007207", "data": "2026-09-02", "mes": "2026-09", "consultor": "Emerson Carlos Da Silva", "assunto": "Forma e condição de pagamento / cadastros diversos", "horas": 5.0}, {"os": "0007231", "data": "2026-09-03", "mes": "2026-09", "consultor": "Katia Regina Vinhali De Lima", "assunto": "Contábil", "horas": 7.0}, {"os": "0007237", "data": "2026-09-05", "mes": "2026-09", "consultor": "Luciano Custodio Junqueira", "assunto": "Sinônimos entre bases", "horas": 7.0}, {"os": "0007238", "data": "2026-09-06", "mes": "2026-09", "consultor": "Luciano Custodio Junqueira", "assunto": "Replicação de cadastros de produtos", "horas": 6.67}, {"os": "0007239", "data": "2026-09-07", "mes": "2026-09", "consultor": "Luciano Custodio Junqueira", "assunto": "Carga de cadastros de empresas", "horas": 6.5}, {"os": "0007227", "data": "2026-09-08", "mes": "2026-09", "consultor": "Emerson Carlos Da Silva", "assunto": "Compras", "horas": 3.0}, {"os": "0007228", "data": "2026-09-09", "mes": "2026-09", "consultor": "Emerson Carlos Da Silva", "assunto": "Compras", "horas": 2.0}, {"os": "0007232", "data": "2026-09-09", "mes": "2026-09", "consultor": "Katia Regina Vinhali De Lima", "assunto": "Contábil", "horas": 3.5}, {"os": "0007274", "data": "2026-09-09", "mes": "2026-09", "consultor": "Leonardo Cassola Gracindo", "assunto": "RH: Cadastros gerais / ponto / SESMT / férias / desligamentos / eSocial", "horas": 7.0}, {"os": "0007233", "data": "2026-09-10", "mes": "2026-09", "consultor": "Katia Regina Vinhali De Lima", "assunto": "Contábil", "horas": 5.5}, {"os": "0007303", "data": "2026-09-15", "mes": "2026-09", "consultor": "Emerson Carlos Da Silva", "assunto": "Comercial: política, tabelas, comissões, pedido de venda", "horas": 2.0}, {"os": "0007304", "data": "2026-09-16", "mes": "2026-09", "consultor": "Emerson Carlos Da Silva", "assunto": "Logística: ordem de separação, estoque", "horas": 3.0}, {"os": "0007305", "data": "2026-09-17", "mes": "2026-09", "consultor": "Emerson Carlos Da Silva", "assunto": "Logística: ordem de separação, estoque", "horas": 5.17}, {"os": "0007235", "data": "2026-09-18", "mes": "2026-09", "consultor": "Katia Regina Vinhali De Lima", "assunto": "Ativo imobilizado", "horas": 6.5}, {"os": "0007337", "data": "2026-10-14", "mes": "2026-10", "consultor": "Katia Regina Vinhali De Lima", "assunto": "Financeiro", "horas": 6.5}, {"os": "0007338", "data": "2026-10-15", "mes": "2026-10", "consultor": "Katia Regina Vinhali De Lima", "assunto": "Fiscal", "horas": 6.0}, {"os": "0007403", "data": "2026-10-20", "mes": "2026-10", "consultor": "Katia Regina Vinhali De Lima", "assunto": "Fiscal (reforma tributária)", "horas": 8.0}, {"os": "0007384", "data": "2026-10-21", "mes": "2026-10", "consultor": "Katia Regina Vinhali De Lima", "assunto": "Financeiro", "horas": 6.5}, {"os": "0007440", "data": "2026-10-28", "mes": "2026-10", "consultor": "Katia Regina Vinhali De Lima", "assunto": "Ativo Imobilizado", "horas": 6.0}], "katia": [{"dia": "2026-10-07", "area": "Financeiro e Contábil", "os": "7334", "horas_os": null, "cronograma": 8, "gravado": null}, {"dia": "2026-10-14", "area": "Contábil", "os": "7337", "horas_os": 6.5, "cronograma": 8, "gravado": null}, {"dia": "2026-10-15", "area": "Financeiro", "os": "7338", "horas_os": 6.0, "cronograma": 8, "gravado": null}, {"dia": "2026-10-20", "area": "Fiscal", "os": "7403", "horas_os": 8.0, "cronograma": 8, "gravado": null}, {"dia": "2026-10-21", "area": "Fiscal", "os": "7384", "horas_os": 6.5, "cronograma": 8, "gravado": null}, {"dia": "2026-10-27", "area": "Financeiro e Fiscal", "os": "", "horas_os": null, "cronograma": 8, "gravado": 6.22}, {"dia": "2026-10-28", "area": "Contábil e Ativo Fixo", "os": "7440", "horas_os": 6.0, "cronograma": 8, "gravado": 4.32}], "bloqueios": [{"bloqueio": "Cadastro de produtos", "area": "Fiscal e Comercial", "severidade": "Crítico", "situacao": "6.587 produtos com tipo errado (2.887 matéria-prima, 3.700 acabado); trava pedidos, regras fiscais e NF. Revisão por de-para em lote.", "responsavel": "Gislaine, Carol, Comercial e Clayton", "produtos": 6587}, {"bloqueio": "Emissão de NF de saída", "area": "Fiscal", "severidade": "Crítico", "situacao": "Erro desconhecido na transmissão (27/10). Falta instalar o certificado e o script por usuário em cada máquina.", "responsavel": "Luciano, João e Elisangela", "produtos": null}, {"bloqueio": "Cobrança e conciliação bancária", "area": "Financeiro", "severidade": "Alto", "situacao": "Remessa não gera (botão Confirmar desativado na matriz) e o OFX do Daycoval falha com 'conta corrente não coincide'.", "responsavel": "Katia e Cintia", "produtos": null}, {"bloqueio": "Reforma tributária", "area": "Fiscal", "severidade": "Alto", "situacao": "Regras fiscais ficam pendentes até CBS/IBS; portal de operação assistida abre em 15/02.", "responsavel": "Katia, Ana e Clayton", "produtos": null}, {"bloqueio": "Customizações sem responsável", "area": "Projeto", "severidade": "Alto", "situacao": "Controle de itens especiais (30h) venceu em 27/10; OF personalizada (20h) vence em 30/10.", "responsavel": "A definir", "produtos": null}], "acoes": [{"responsavel": "João", "area": "TI", "acao": "Instalar o certificado da Metalloys 09 e o script por usuário em homologação, com Emerson e Luciano"}, {"responsavel": "João", "area": "TI", "acao": "Dar ao William acesso à Ficha Financeira Cliente"}, {"responsavel": "João", "area": "TI", "acao": "Criar a pasta compartilhada dos PDFs de boletos"}, {"responsavel": "João", "area": "TI", "acao": "Dar acesso aos caminhos do XML e da DANFE a quem emite NF-e"}, {"responsavel": "João", "area": "TI", "acao": "Pedir as 2 cargas de serviços (código no produto e tabela LC 116)"}, {"responsavel": "João", "area": "TI", "acao": "Alinhar com o Luciano cadastro de produtos, customizações do Fiscal e MOT"}, {"responsavel": "João", "area": "TI", "acao": "Relatório de vencimento dos documentos de fabricante"}, {"responsavel": "João", "area": "TI", "acao": "Criar o grupo técnico com Luciano e Marcos (frete e impostos no Ejecty)"}, {"responsavel": "Gislaine", "area": "Fiscal", "acao": "Mapear os códigos de serviço da LC 116 para a carga"}, {"responsavel": "Gislaine", "area": "Fiscal", "acao": "Definir quem do Fiscal lança as guias de imposto"}, {"responsavel": "Gislaine", "area": "Fiscal", "acao": "Coordenar a revisão dos produtos com Carol e Comercial"}, {"responsavel": "Clayton", "area": "Fiscal", "acao": "Terminar a nota de débito de juros e multa"}, {"responsavel": "Clayton", "area": "Fiscal", "acao": "Montar o de-para dos produtos e listar as customizações"}, {"responsavel": "Vanessa", "area": "Fiscal", "acao": "Praticar o lançamento de NFSe e pagamento com juros e multa"}, {"responsavel": "Ana", "area": "Fiscal", "acao": "Replicar as regras da operação 1 nas operações novas e inativar as antigas"}, {"responsavel": "Katia", "area": "Zucchetti", "acao": "Reportar os bugs da remessa e do OFX antes de 10/11"}, {"responsavel": "Katia", "area": "Zucchetti", "acao": "Confirmar se Clayton, Ana e Gislaine podem mudar vencimento das notas"}, {"responsavel": "Katia", "area": "Zucchetti", "acao": "Seguir as regras fiscais pendentes pelo SPED de julho"}, {"responsavel": "Luciano", "area": "Zucchetti", "acao": "Resolver o erro desconhecido na NF de saída"}, {"responsavel": "Luciano", "area": "Zucchetti", "acao": "Boleto do pedido que não aparece no lançamento da NFSe"}, {"responsavel": "Luciano", "area": "Zucchetti", "acao": "Tickets dos 2 bugs da Qualidade; trigger de controlados; TXT do Simproquim"}, {"responsavel": "Luciano", "area": "Zucchetti", "acao": "Tabelas de frete e impostos para o Marcos; treinar a Logística"}, {"responsavel": "Elisangela", "area": "Contábil", "acao": "Corrigir a conta dos produtos de revenda (tipo 600)"}, {"responsavel": "Elisangela", "area": "Contábil", "acao": "Tabular as construções em andamento da Nicomo e criar as contas"}, {"responsavel": "Elisangela", "area": "Contábil", "acao": "Rateios, centros de custo, fluxo de caixa, viagens e parcelamentos"}, {"responsavel": "Elisangela", "area": "Contábil", "acao": "Exportar a lista de clientes ativos para o William"}, {"responsavel": "Cintia", "area": "Financeiro", "acao": "Mandar à Katia o OFX do Daycoval; confirmar o ambiente de teste do Atena"}, {"responsavel": "William", "area": "Financeiro", "acao": "Completar o cadastro dos clientes mais frequentes; Zona Franca"}, {"responsavel": "Beatriz", "area": "Financeiro", "acao": "Layouts Atena e Itaú; praticar adiantamentos e conciliação"}, {"responsavel": "Mario", "area": "Comercial", "acao": "Planilha de frete ao Marcos; lista de produtos a inativar"}, {"responsavel": "Marcos", "area": "Ejecty", "acao": "Definir a integração de frete e impostos; requisitos com Marinho em 10/11"}, {"responsavel": "Carol", "area": "Nicomo", "acao": "Inativar os produtos da lista do Mario; classificação fiscal"}, {"responsavel": "Wesley", "area": "Nicomo", "acao": "Documentação do Simproquim ao Luciano; teste de inspeção de recebimento"}], "decisoes": [{"data": "2026-10-28", "area": "Projeto", "decisao": "Zucchetti presencial na semana do go-live (04/01)"}, {"data": "2026-10-28", "area": "Contábil", "decisao": "Ativo fixo com conta de controle por bem, ligada ao pedido"}, {"data": "2026-10-28", "area": "Comercial", "decisao": "Debx é a fonte de preço, frete e impostos; o Ejecty calcula"}, {"data": "2026-10-27", "area": "Fiscal", "decisao": "Nenhum serviço sem pedido de compra aprovado; NFSe gera os impostos retidos a pagar"}, {"data": "2026-10-27", "area": "Fiscal", "decisao": "Impostos retidos pagos por DARF única, conferida pelo Financeiro"}, {"data": "2026-10-27", "area": "Financeiro", "decisao": "CNAB de contas a pagar do Itaú adiado; horas vão para a migração do RH"}, {"data": "2026-10-27", "area": "Comercial", "decisao": "Comissão calculada sem o frete (preço FOB)"}, {"data": "2026-10-26", "area": "Qualidade", "decisao": "Documentos de fabricante vão para anexos do Debx; produtos parados há 1 ano serão inativados"}, {"data": "2026-10-21", "area": "Fiscal", "decisao": "Industrialização da Nicomo é tratada como MOT (industrialização de terceiro)"}, {"data": "2026-10-21", "area": "Fiscal", "decisao": "Código interno do serviço passa a ser o da LC 116"}, {"data": "2026-10-21", "area": "Contábil", "decisao": "Despesa nova começa no Contábil: conta e grupo ligados ao produto"}, {"data": "2026-10-20", "area": "Qualidade", "decisao": "Produtos controlados bloqueados na NF por trigger, com limite por cliente e produto"}, {"data": "2026-10-20", "area": "Fiscal", "decisao": "Serviço recorrente vira pedido de compra anual; viagens no módulo de despesas"}, {"data": "2026-10-20", "area": "Fiscal", "decisao": "Regras fiscais criadas como pendentes; Katia pré-configura pelo SPED de julho"}, {"data": "2026-10-07", "area": "Financeiro", "decisao": "Fluxo de caixa segue a planilha da Jeane usada nos relatórios da diretoria"}, {"data": "2026-10-07", "area": "Contábil", "decisao": "Bancos em duas etapas: Financeiro cadastra, Contábil vincula a conta"}], "kickoff": [{"horas_contratadas": 800, "modulos_contratados": 18, "cnpjs": 35, "data_kickoff": "2026-06-16", "regime": "Escopo aberto", "areas_fora": "Importação", "contratos_a_parte": "Importação (Nexus) e CRM Ejecty, contratos à parte", "modulos": "Cadastros, Contábil, Fiscal, Suprimentos, Produção, Vendas, Financeiro, Estoque, Logística, Perfil, CRM, Engenharias, PCP, RH, Manutenção, Qualidade, Gestão de Projetos, Assistência Técnica"}]}</script>
+<script>
+(() => {
+  const D = JSON.parse(document.getElementById('data').textContent);
+  const $ = (id) => document.getElementById(id);
+  const nf = new Intl.NumberFormat('pt-BR');
+  const MES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+  const fmtH = (v) => { if (v == null || isNaN(v)) return '—'; let h = Math.floor(v + 1e-9), m = Math.round((v - h) * 60); if (m === 60) { h++; m = 0; } return m ? `${h}h${String(m).padStart(2, '0')}` : `${h}h`; };
+  const fmtSaldo = (v) => (v > 0 ? '+' : v < 0 ? '−' : '') + fmtH(Math.abs(v));
+  const fmtD = (d) => d ? `${d.slice(8, 10)}/${d.slice(5, 7)}` : '—';
+  const fmtMes = (p) => `${MES[+p.slice(5, 7) - 1]}/${p.slice(2, 4)}`;
+  const today = new Date(); const t0 = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+  const todayISO = new Date(t0).toISOString().slice(0, 10);
+  const diasAte = (iso) => Math.round((Date.parse(iso + 'T00:00:00Z') - t0) / 864e5);
+  const set = (id, txt) => { const e = $(id); if (e) e.textContent = txt; };
+  const el = (tag, attrs = {}, ...kids) => { const e = document.createElement(tag); for (const [k, v] of Object.entries(attrs)) { if (k === 'class') e.className = v; else e.setAttribute(k, v); } for (const k of kids) e.append(k); return e; };
+  const SVG = 'http://www.w3.org/2000/svg';
+  const sv = (tag, attrs = {}) => { const e = document.createElementNS(SVG, tag); for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v); return e; };
+  const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
+  // ---------- números ----------
+  const K = D.kickoff[0]; const fora = K.areas_fora.toLowerCase();
+  let total = 0, real = 0, imp = 0;
+  for (const r of D.cronograma) { const h = +r.horas || 0; if ((r.area || '').toLowerCase() === fora) { imp += h; continue; } total += h; if (r.status === 'Realizado') real += h; }
+  const contr = K.horas_contratadas, saldo = contr - total, pct = real / contr;
+  const osTot = D.oss.reduce((a, r) => a + r.horas, 0);
+  const dGo = diasAte('2027-01-04'), dEj = diasAte('2026-11-23');
+  set('hdr-dias', nf.format(Math.max(0, dGo))); set('t-dias', nf.format(Math.max(0, dGo)));
+  set('t-ej', dEj >= 0 ? nf.format(dEj) : 'no ar'); set('e-dias', dEj >= 0 ? nf.format(dEj) : 'no ar');
+  set('v-total', fmtH(total)); set('v-saldo', fmtSaldo(saldo)); set('v-pct', Math.round(pct * 100) + '%');
+  set('t-pct', Math.round(pct * 100) + '%'); set('t-real', fmtH(real)); set('t-saldo', fmtSaldo(saldo)); set('t-plan', fmtH(total));
+  if (saldo < 0) $('t-saldo-box').className = 'tile warn';
+  set('t-os', fmtH(osTot)); set('t-nos', nf.format(D.oss.length));
+  const sep = D.oss.filter((r) => r.mes === '2026-09'); const out = D.oss.filter((r) => r.mes === '2026-10');
+  set('s-horas', fmtH(sep.reduce((a, r) => a + r.horas, 0))); set('s-nos', nf.format(sep.length));
+  set('o-horas', fmtH(out.reduce((a, r) => a + r.horas, 0)));
+  set('o-bloq', nf.format(D.bloqueios.length)); set('o-crit', nf.format(D.bloqueios.filter((b) => b.severidade === 'Crítico').length));
+  set('c-ntar', nf.format(D.cronograma.length));
+
+  // ---------- tooltip ----------
+  const tipIn = (box) => { let t = box.querySelector('.tip'); if (!t) { t = el('div', { class: 'tip' }); t.hidden = true; box.append(t); } return t; };
+  const showTip = (box, t, head, lines, ev) => {
+    t.replaceChildren(el('div', { class: 'th' }, head), ...lines.map((l) => el('div', {}, l))); t.hidden = false;
+    const r = box.getBoundingClientRect(); let x = ev.clientX - r.left + 12, y = ev.clientY - r.top - t.offsetHeight - 8;
+    if (x + t.offsetWidth > r.width) x = Math.max(0, x - t.offsetWidth - 24); if (y < 0) y = ev.clientY - r.top + 14;
+    t.style.left = x + 'px'; t.style.top = y + 'px';
+  };
+  const measure = (svg, cls, texts) => { const p = sv('text', { class: cls || '' }); svg.append(p); let w = 0; for (const s of texts) { p.textContent = s; w = Math.max(w, p.getComputedTextLength()); } p.remove(); return w; };
+
+  // ---------- gráficos ----------
+  const draws = [];
+  const vbars = (box, rows, o) => {
+    const W = Math.max(300, box.clientWidth), H = o.h || 240;
+    const svg = sv('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': o.label }); box.replaceChildren(svg); const tip = tipIn(box);
+    const tot = rows.map((r) => o.series.reduce((a, s) => a + (+r[s.k] || 0), 0)); const mx = Math.max(...tot, 1);
+    const step = mx > 200 ? 100 : mx > 80 ? 20 : 10; const top = Math.ceil(mx / step) * step;
+    const ticks = []; for (let v = 0; v <= top; v += step) ticks.push(v);
+    const ml = measure(svg, '', ticks.map(fmtH)) + 10; const y = (v) => (H - 26) - (v / top) * (H - 48);
+    const bandW = (W - ml - 4) / rows.length; const bw = Math.min(44, bandW * 0.6);
+    ticks.forEach((t) => { svg.append(sv('line', { x1: ml, x2: W - 4, y1: y(t), y2: y(t), stroke: css('--line-soft') })); const tx = sv('text', { x: ml - 8, y: y(t) + 4, 'text-anchor': 'end' }); tx.textContent = fmtH(t); svg.append(tx); });
+    rows.forEach((r, i) => {
+      const cx = ml + bandW * i + bandW / 2; let base = 0;
+      o.series.forEach((s) => { const v = +r[s.k] || 0; if (!v) return; svg.append(sv('rect', { x: cx - bw / 2, width: bw, y: y(base + v), height: y(base) - y(base + v), rx: 3, fill: s.c })); base += v; });
+      const vl = sv('text', { class: 'v', x: cx, y: y(tot[i]) - 6, 'text-anchor': 'middle' }); vl.textContent = fmtH(tot[i]); svg.append(vl);
+      const xl = sv('text', { x: cx, y: H - 6, 'text-anchor': 'middle' }); xl.textContent = o.xf(r[o.x]); svg.append(xl);
+      const hit = sv('rect', { x: ml + bandW * i, width: bandW, y: 0, height: H - 20, fill: 'transparent' });
+      hit.addEventListener('mousemove', (ev) => showTip(box, tip, o.xf(r[o.x]), o.series.map((s) => `${o.series.length > 1 ? s.n + ': ' : ''}${fmtH(+r[s.k] || 0)}`), ev));
+      hit.addEventListener('mouseleave', () => { tip.hidden = true; }); svg.append(hit);
+    });
+  };
+  const hbars = (box, rows, o) => {
+    const W = Math.max(300, box.clientWidth), rh = 30, H = rows.length * rh + 6;
+    const svg = sv('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': o.label }); box.replaceChildren(svg); const tip = tipIn(box);
+    const tot = rows.map((r) => o.series.reduce((a, s) => a + (+r[s.k] || 0), 0)); const mx = Math.max(...tot, 1);
+    const ml = Math.min(W * 0.42, measure(svg, '', rows.map((r) => r[o.y]))) + 10; const mr = measure(svg, 'v', tot.map(fmtH)) + 10;
+    const x = (v) => ml + (v / mx) * (W - ml - mr);
+    rows.forEach((r, i) => {
+      const yy = i * rh + 4, bh = rh - 10; let base = 0;
+      o.series.forEach((s) => { const v = +r[s.k] || 0; if (!v) return; svg.append(sv('rect', { x: x(base), width: x(base + v) - x(base), y: yy, height: bh, rx: 3, fill: s.c })); base += v; });
+      const lb = sv('text', { x: ml - 8, y: yy + bh / 2 + 4, 'text-anchor': 'end' }); lb.textContent = r[o.y]; svg.append(lb);
+      const vl = sv('text', { class: 'v', x: x(tot[i]) + 6, y: yy + bh / 2 + 4 }); vl.textContent = fmtH(tot[i]); svg.append(vl);
+      const hit = sv('rect', { x: 0, width: W, y: yy - 3, height: rh, fill: 'transparent', style: o.click ? 'cursor:pointer' : '' });
+      hit.addEventListener('mousemove', (ev) => showTip(box, tip, r[o.y], o.series.map((s) => `${s.n}: ${fmtH(+r[s.k] || 0)}`), ev));
+      hit.addEventListener('mouseleave', () => { tip.hidden = true; });
+      if (o.click) hit.addEventListener('click', () => o.click(r)); svg.append(hit);
+    });
+  };
+  const S2 = () => [{ k: 'realizado', n: 'Realizado', c: css('--accent') }, { k: 'planejado', n: 'Planejado', c: css('--muted-bar') }];
+  const group = (rows, key) => { const g = {}; for (const r of rows) { const k = key(r); if (k == null) continue; g[k] = g[k] || { realizado: 0, planejado: 0 }; g[k][r.status === 'Realizado' ? 'realizado' : 'planejado'] += +r.horas || 0; } return g; };
+
+  draws.push(() => { // fases do kick-off
+    const box = $('c-fases'); const W = Math.max(300, box.clientWidth);
+    const ph = [['Iniciação', '2026-06-16', '2026-07-31'], ['Planejamento', '2026-07-15', '2026-08-31'], ['Execução', '2026-08-25', '2026-12-15'], ['Transição operacional', '2026-12-01', '2027-01-31'], ['Encerramento', '2027-01-20', '2027-02-28']];
+    const a = Date.parse('2026-06-01'), b = Date.parse('2027-03-01'); const nar = W < 560;
+    const lw = nar ? 0 : 170; const H = ph.length * 34 + 44 + (nar ? ph.length * 16 : 0);
+    const svg = sv('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'Fases do projeto' }); box.replaceChildren(svg);
+    const x = (iso) => lw + ((Date.parse(iso) - a) / (b - a)) * (W - lw - 4);
+    for (let m = 0; m < 9; m++) { const d = new Date(Date.UTC(2026, 5 + m, 1)); const iso = d.toISOString().slice(0, 10); svg.append(sv('line', { x1: x(iso), x2: x(iso), y1: 20, y2: H - 4, stroke: css('--line-soft') })); const t = sv('text', { x: x(iso) + 4, y: 14 }); t.textContent = `${MES[d.getUTCMonth()]}${d.getUTCMonth() === 0 ? '/27' : ''}`; if (!nar || m % 2 === 0) svg.append(t); }
+    const cols = [css('--accent'), css('--accent'), css('--accent'), css('--warn'), css('--muted-bar')];
+    ph.forEach(([n, s, e], i) => {
+      const yy = 28 + i * (34 + (nar ? 16 : 0));
+      if (nar) { const t = sv('text', { class: 'st', x: 0, y: yy + 10 }); t.textContent = n; svg.append(t); }
+      else { const t = sv('text', { class: 'st', x: 0, y: yy + 16 }); t.textContent = n; svg.append(t); }
+      const by = nar ? yy + 16 : yy + 4; const done = Date.parse(e) < t0;
+      svg.append(sv('rect', { x: x(s), y: by, width: Math.max(4, x(e) - x(s)), height: 16, rx: 3, fill: cols[i], opacity: done ? 0.55 : 1 }));
+    });
+    const marks = [['2026-11-23', 'Ejecty'], ['2027-01-04', 'Go-live']];
+    marks.forEach(([iso, n]) => { const t = sv('text', { class: 'v', x: x(iso), y: H - 2, 'text-anchor': 'middle' }); t.textContent = `${n} ${fmtD(iso)}`; svg.append(sv('circle', { cx: x(iso), cy: H - 16, r: 4, fill: css('--fg') })); svg.append(t); });
+    if (t0 > a && t0 < b) { const hx = x(todayISO); svg.append(sv('line', { x1: hx, x2: hx, y1: 18, y2: H - 22, stroke: css('--bad'), 'stroke-width': 2 })); const t = sv('text', { x: hx + 4, y: 30, style: `fill:${css('--bad')};font-weight:600` }); t.textContent = 'hoje'; svg.append(t); }
+  });
+  draws.push(() => { // contrato
+    const box = $('c-contrato'); const W = Math.max(300, box.clientWidth), H = 96;
+    const svg = sv('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'Contrato x cronograma' }); box.replaceChildren(svg);
+    const mx = Math.max(total, contr) * 1.05; const x = (v) => (v / mx) * W; const y0 = 30, bh = 26;
+    svg.append(sv('rect', { x: 0, y: y0, width: x(real), height: bh, rx: 3, fill: css('--accent') }));
+    svg.append(sv('rect', { x: x(real), y: y0, width: x(total) - x(real), height: bh, rx: 3, fill: css('--muted-bar') }));
+    svg.append(sv('line', { x1: x(contr), x2: x(contr), y1: y0 - 10, y2: y0 + bh + 8, stroke: css('--fg'), 'stroke-width': 2, 'stroke-dasharray': '4 3' }));
+    const t1 = sv('text', { class: 'v', x: x(contr), y: y0 - 14, 'text-anchor': 'end' }); t1.textContent = `800h contratadas`; svg.append(t1);
+    const t2 = sv('text', { x: 0, y: y0 + bh + 22 }); t2.textContent = `${fmtH(real)} realizadas`; svg.append(t2);
+    const t3 = sv('text', { class: 'v', x: x(total), y: y0 + bh + 22, 'text-anchor': 'end' }); t3.textContent = `${fmtH(total)} no cronograma`; svg.append(t3);
+  });
+  draws.push(() => { const g = {}; for (const r of D.oss) g[r.mes] = (g[r.mes] || 0) + r.horas; vbars($('c-mes'), Object.keys(g).sort().map((m) => ({ mes: m, h: g[m] })), { x: 'mes', xf: fmtMes, label: 'Horas por mês', series: [{ k: 'h', n: 'Horas', c: css('--accent') }] }); });
+  draws.push(() => { const g = {}; for (const r of sep) g[r.consultor] = g[r.consultor] || { h: 0, n: 0 }, g[r.consultor].h += r.horas, g[r.consultor].n++; const rows = Object.entries(g).map(([c, v]) => ({ c: c.split(' ')[0] + ` (${v.n} OS${v.n > 1 ? 's' : ''})`, h: v.h })).sort((p, q) => q.h - p.h); hbars($('c-cons'), rows, { y: 'c', label: 'Horas por consultor', series: [{ k: 'h', n: 'Horas', c: css('--accent') }] }); });
+  draws.push(() => { const g = group(D.cronograma, (r) => r.periodo); vbars($('c-periodo'), Object.keys(g).sort().map((p) => ({ p, ...g[p] })), { x: 'p', xf: fmtMes, h: 260, label: 'Horas do cronograma por mês', series: S2() }); });
+  draws.push(() => {
+    const g = group(D.cronograma, (r) => r.area ? r.area.charAt(0).toUpperCase() + r.area.slice(1) : 'Sem área');
+    const rows = Object.entries(g).map(([a, v]) => ({ a, ...v })).filter((r) => r.realizado + r.planejado > 0).sort((p, q) => (q.realizado + q.planejado) - (p.realizado + p.planejado));
+    hbars($('c-area'), rows, { y: 'a', label: 'Horas por área', series: S2(), click: (r) => { const raw = D.cronograma.find((x) => (x.area || '').toLowerCase() === r.a.toLowerCase()); $('f-area').value = raw ? raw.area : ''; renderTar(); $('tarefas').scrollIntoView({ behavior: 'smooth' }); } });
+  });
+
+  // ---------- listas ----------
+  const prox = D.cronograma.filter((r) => r.status !== 'Realizado' && r.data && r.data >= todayISO).sort((p, q) => p.data.localeCompare(q.data)).slice(0, 10);
+  $('v-prox').replaceChildren(...(prox.length ? prox.map((r) => el('div', { class: 'row' }, el('div', { class: 'dt' }, fmtD(r.data)), el('div', {}, el('b', {}, r.area + ': '), r.assunto + (r.consultor ? ` · ${r.consultor}` : '')))) : [el('div', { class: 'row' }, el('div', { class: 'dt' }, '—'), el('div', {}, 'Sem agendas planejadas com data.'))]));
+  $('s-oss').replaceChildren(...sep.slice().sort((p, q) => p.data.localeCompare(q.data)).map((r) => el('tr', {}, el('td', { class: 'nw' }, fmtD(r.data)), el('td', { class: 'nw' }, r.os.replace(/^0+/, '')), el('td', {}, r.consultor.split(' ')[0]), el('td', { class: 'hide-sm' }, r.assunto), el('td', { class: 'r' }, fmtH(r.horas)))));
+  set('s-oss-tot', fmtH(sep.reduce((a, r) => a + r.horas, 0)));
+  const sevClass = { 'Crítico': 'pill bad', 'Alto': 'pill warn' };
+  $('o-bloqueios').replaceChildren(...D.bloqueios.map((b) => el('div', { class: 'blk' }, el('div', { class: 'h' }, el('b', {}, b.bloqueio), el('span', { class: sevClass[b.severidade] || 'pill plain' }, b.severidade)), el('span', {}, b.situacao), el('span', { class: 'who' }, `${b.area} · ${b.responsavel}`))));
+  $('o-decisoes').replaceChildren(...D.decisoes.slice().sort((p, q) => q.data.localeCompare(p.data)).map((d) => el('div', { class: 'dec' }, el('span', { class: 't' }, d.decisao), el('span', { class: 'd' }, `${fmtD(d.data)} · ${d.area}`))));
+  const K2 = D.katia.slice().sort((p, q) => q.dia.localeCompare(p.dia));
+  $('o-katia').replaceChildren(...K2.map((r) => el('tr', {}, el('td', { class: 'nw' }, fmtD(r.dia)), el('td', {}, r.area), el('td', { class: 'nw' }, r.os ? (r.os === '7334' ? '7334 (não recebida)' : r.os) : 'sem OS'), el('td', { class: 'r' }, fmtH(r.horas_os)), el('td', { class: 'r hide-sm' }, fmtH(r.cronograma)), el('td', { class: 'r' }, fmtH(r.gravado)))));
+  set('o-k-os', fmtH(D.katia.reduce((a, r) => a + (r.horas_os || 0), 0))); set('o-k-cr', fmtH(D.katia.reduce((a, r) => a + (r.cronograma || 0), 0))); set('o-k-gr', fmtH(D.katia.reduce((a, r) => a + (r.gravado || 0), 0)));
+
+  const fill = (sel, vals) => { for (const v of vals) sel.append(new Option(v, v)); };
+  const uniq = (arr) => Array.from(new Set(arr.filter(Boolean))).sort((p, q) => p.localeCompare(q, 'pt-BR'));
+  fill($('f-aarea'), uniq(D.acoes.map((r) => r.area))); fill($('f-resp'), uniq(D.acoes.map((r) => r.responsavel)));
+  const renderAc = () => { const a = $('f-aarea').value, p = $('f-resp').value; const rows = D.acoes.filter((r) => (!a || r.area === a) && (!p || r.responsavel === p)); $('o-acoes').replaceChildren(...rows.map((r) => el('tr', {}, el('td', { class: 'nw' }, r.responsavel), el('td', { class: 'hide-sm' }, r.area), el('td', {}, r.acao)))); set('n-acoes', `${nf.format(rows.length)} ações`); };
+  $('f-aarea').addEventListener('change', renderAc); $('f-resp').addEventListener('change', renderAc); renderAc();
+
+  fill($('f-area'), uniq(D.cronograma.map((r) => r.area))); fill($('f-cons'), uniq(D.cronograma.map((r) => r.consultor)));
+  const ord = (r) => r.data || (r.periodo ? r.periodo + '-99' : '9999');
+  function renderTar() {
+    const a = $('f-area').value, c = $('f-cons').value, s = $('f-status').value, q = $('f-q').value.trim().toLowerCase();
+    const rows = D.cronograma.filter((r) => (!a || r.area === a) && (!c || r.consultor === c) && (!s || r.status === s) && (!q || `${r.assunto} ${r.key_users} ${r.observacao} ${r.codigo}`.toLowerCase().includes(q))).sort((p, q2) => ord(p).localeCompare(ord(q2)) || p.codigo.localeCompare(q2.codigo));
+    $('t-tar').replaceChildren(...rows.map((r) => el('tr', {}, el('td', { class: 'nw' }, r.codigo), el('td', { class: 'nw' }, r.data ? fmtD(r.data) : (r.periodo ? fmtMes(r.periodo) : '—')), el('td', {}, r.area), el('td', {}, r.assunto), el('td', { class: 'hide-sm' }, r.consultor || '—'), el('td', {}, el('span', { class: r.status === 'Realizado' ? 'pill ok' : 'pill plain' }, r.status)), el('td', { class: 'r' }, r.horas == null ? 'a definir' : fmtH(r.horas)))));
+    set('n-tar', `Mostrando ${nf.format(rows.length)} tarefas, ${fmtH(rows.reduce((t, r) => t + (+r.horas || 0), 0))}.`);
+  }
+  ['f-area', 'f-cons', 'f-status'].forEach((id) => $(id).addEventListener('change', renderTar)); $('f-q').addEventListener('input', renderTar);
+  $('f-clear').addEventListener('click', () => { ['f-area', 'f-cons', 'f-status', 'f-q'].forEach((id) => { $(id).value = ''; }); renderTar(); }); renderTar();
+
+  // ---------- abas ----------
+  const pages = ['visao', 'setembro', 'outubro', 'ejecty', 'cronograma'];
+  const drawAll = () => draws.forEach((f) => { try { f(); } catch (e) { console.error(e); } });
+  const show = () => {
+    const h = location.hash.slice(1); const pg = pages.includes(h) ? h : 'visao';
+    document.querySelectorAll('section.page').forEach((s) => { s.hidden = s.dataset.page !== pg; });
+    document.querySelectorAll('nav.tabs a').forEach((a) => { if (a.dataset.tab === pg) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+    drawAll(); if (pages.includes(h)) window.scrollTo(0, 0);
+  };
+  window.addEventListener('hashchange', show);
+  let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(drawAll, 150); });
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', drawAll);
+  show();
+})();
+</script>
+</body>
+</html>
