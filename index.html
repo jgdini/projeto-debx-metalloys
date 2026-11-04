@@ -135,6 +135,24 @@ button.clear { font: inherit; font-size: 13px; color: var(--muted); background: 
 .phase.done { border-color: var(--ok-line); background: var(--ok-bg); }
 .phase.now { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
 .phase b { font-size: 15px; }
+/* hero */
+.hero { position: relative; overflow: hidden; border-radius: 16px; background: #0C3A40; color: #F2EFE8; display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 8px; align-items: center; padding: clamp(20px, 3vw, 36px); }
+.hero h2 { font-size: clamp(26px, 3.2vw, 38px); line-height: 1.1; color: #F2EFE8; margin-top: 8px; }
+.hero p { margin: 12px 0 0; color: #C9D6D4; max-width: 46ch; }
+.hero .hero-eb { color: #7FD1D9; }
+.hero-steps { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.hero-steps span { font-size: 13px; font-weight: 600; padding: 6px 12px; border-radius: 999px; border: 1px solid rgba(242,239,232,.25); color: rgba(242,239,232,.55); transition: all .4s ease; }
+.hero-steps span.on { color: #0C3A40; background: #7FD1D9; border-color: #7FD1D9; }
+.hero-steps span.on.warm { background: #E8B35C; border-color: #E8B35C; }
+.hero-art svg { display: block; width: 100%; height: auto; }
+.hero-art text { font-family: var(--sans); }
+@media (max-width: 760px) { .hero { grid-template-columns: 1fr; } }
+/* barras crescendo e números */
+.chart .bar-v { transform-box: fill-box; transform-origin: 50% 100%; transform: scaleY(0); transition: transform .9s cubic-bezier(.2,.7,.2,1); }
+.chart .bar-h { transform-box: fill-box; transform-origin: 0 50%; transform: scaleX(0); transition: transform 1s cubic-bezier(.2,.7,.2,1); }
+.chart .lbl { opacity: 0; transition: opacity .5s ease .7s; }
+.chart.in .bar-v { transform: scaleY(1); } .chart.in .bar-h { transform: scaleX(1); } .chart.in .lbl { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .chart .bar-v, .chart .bar-h { transform: none; transition: none; } .chart .lbl { opacity: 1; transition: none; } }
 footer { border-top: 1px solid var(--line); padding-block: 18px 32px; font-size: 13px; color: var(--muted); }
 @media (max-width: 640px) {
   .hide-sm { display: none; }
@@ -167,6 +185,15 @@ footer { border-top: 1px solid var(--line); padding-block: 18px 32px; font-size:
 
 <!-- ===================== VISÃO GERAL ===================== -->
 <section class="page" id="visao" data-page="visao">
+  <div class="hero" id="hero">
+    <div class="hero-txt">
+      <span class="eyebrow hero-eb">Grupo Metalloys · um só ecossistema</span>
+      <h2>De 5 sistemas separados para 1 Debx nas 4 empresas</h2>
+      <p>Nicomo, Translogs, Metalloys e Schem passam a operar no mesmo ERP, com o CRM Ejecty integrado, a partir de 04/01/2027.</p>
+      <div class="hero-steps"><span id="hs-a" class="on warm">Antes · 5 sistemas descentralizados</span><span id="hs-b">Futuro · 1 sistema para as 4 empresas</span></div>
+    </div>
+    <div class="hero-art"><svg id="hero-svg" viewBox="0 0 600 360" role="img" aria-label="Cinco sistemas separados ligados às quatro empresas se unem em um único Debx no centro"></svg></div>
+  </div>
   <div class="lead">
     <span class="pill ok">No prazo · cadastro de produtos é o ponto crítico</span>
     <h1>Implantação do Debx na Metalloys</h1>
@@ -608,8 +635,8 @@ footer { border-top: 1px solid var(--line); padding-block: 18px 32px; font-size:
     ticks.forEach((t) => { svg.append(sv('line', { x1: ml, x2: W - 4, y1: y(t), y2: y(t), stroke: css('--line-soft') })); const tx = sv('text', { x: ml - 8, y: y(t) + 4, 'text-anchor': 'end' }); tx.textContent = fmtH(t); svg.append(tx); });
     rows.forEach((r, i) => {
       const cx = ml + bandW * i + bandW / 2; let base = 0;
-      o.series.forEach((s) => { const v = +r[s.k] || 0; if (!v) return; svg.append(sv('rect', { x: cx - bw / 2, width: bw, y: y(base + v), height: y(base) - y(base + v), rx: 3, fill: s.c })); base += v; });
-      const vl = sv('text', { class: 'v', x: cx, y: y(tot[i]) - 6, 'text-anchor': 'middle' }); vl.textContent = fmtH(tot[i]); svg.append(vl);
+      o.series.forEach((s) => { const v = +r[s.k] || 0; if (!v) return; svg.append(sv('rect', { class: 'bar-v', style: `transition-delay:${i * 70}ms`, x: cx - bw / 2, width: bw, y: y(base + v), height: y(base) - y(base + v), rx: 3, fill: s.c })); base += v; });
+      const vl = sv('text', { class: 'v lbl', x: cx, y: y(tot[i]) - 6, 'text-anchor': 'middle' }); vl.textContent = fmtH(tot[i]); svg.append(vl);
       const xl = sv('text', { x: cx, y: H - 6, 'text-anchor': 'middle' }); xl.textContent = o.xf(r[o.x]); svg.append(xl);
       const hit = sv('rect', { x: ml + bandW * i, width: bandW, y: 0, height: H - 20, fill: 'transparent' });
       hit.addEventListener('mousemove', (ev) => showTip(box, tip, o.xf(r[o.x]), o.series.map((s) => `${o.series.length > 1 ? s.n + ': ' : ''}${fmtH(+r[s.k] || 0)}`), ev));
@@ -624,9 +651,9 @@ footer { border-top: 1px solid var(--line); padding-block: 18px 32px; font-size:
     const x = (v) => ml + (v / mx) * (W - ml - mr);
     rows.forEach((r, i) => {
       const yy = i * rh + 4, bh = rh - 10; let base = 0;
-      o.series.forEach((s) => { const v = +r[s.k] || 0; if (!v) return; svg.append(sv('rect', { x: x(base), width: x(base + v) - x(base), y: yy, height: bh, rx: 3, fill: s.c })); base += v; });
+      o.series.forEach((s) => { const v = +r[s.k] || 0; if (!v) return; svg.append(sv('rect', { class: 'bar-h', style: `transition-delay:${i * 50}ms`, x: x(base), width: x(base + v) - x(base), y: yy, height: bh, rx: 3, fill: s.c })); base += v; });
       const lb = sv('text', { x: ml - 8, y: yy + bh / 2 + 4, 'text-anchor': 'end' }); lb.textContent = r[o.y]; svg.append(lb);
-      const vl = sv('text', { class: 'v', x: x(tot[i]) + 6, y: yy + bh / 2 + 4 }); vl.textContent = fmtH(tot[i]); svg.append(vl);
+      const vl = sv('text', { class: 'v lbl', x: x(tot[i]) + 6, y: yy + bh / 2 + 4 }); vl.textContent = fmtH(tot[i]); svg.append(vl);
       const hit = sv('rect', { x: 0, width: W, y: yy - 3, height: rh, fill: 'transparent', style: o.click ? 'cursor:pointer' : '' });
       hit.addEventListener('mousemove', (ev) => showTip(box, tip, r[o.y], o.series.map((s) => `${s.n}: ${fmtH(+r[s.k] || 0)}`), ev));
       hit.addEventListener('mouseleave', () => { tip.hidden = true; });
@@ -650,7 +677,7 @@ footer { border-top: 1px solid var(--line); padding-block: 18px 32px; font-size:
       if (nar) { const t = sv('text', { class: 'st', x: 0, y: yy + 10 }); t.textContent = n; svg.append(t); }
       else { const t = sv('text', { class: 'st', x: 0, y: yy + 16 }); t.textContent = n; svg.append(t); }
       const by = nar ? yy + 16 : yy + 4; const done = Date.parse(e) < t0;
-      svg.append(sv('rect', { x: x(s), y: by, width: Math.max(4, x(e) - x(s)), height: 16, rx: 3, fill: cols[i], opacity: done ? 0.55 : 1 }));
+      svg.append(sv('rect', { class: 'bar-h', style: `transition-delay:${i * 120}ms`, x: x(s), y: by, width: Math.max(4, x(e) - x(s)), height: 16, rx: 3, fill: cols[i], opacity: done ? 0.55 : 1 }));
     });
     const marks = [['2026-11-23', 'Ejecty'], ['2027-01-04', 'Go-live']];
     marks.forEach(([iso, n]) => { const t = sv('text', { class: 'v', x: x(iso), y: H - 2, 'text-anchor': 'middle' }); t.textContent = `${n} ${fmtD(iso)}`; svg.append(sv('circle', { cx: x(iso), cy: H - 16, r: 4, fill: css('--fg') })); svg.append(t); });
@@ -660,8 +687,8 @@ footer { border-top: 1px solid var(--line); padding-block: 18px 32px; font-size:
     const box = $('c-contrato'); const W = Math.max(300, box.clientWidth), H = 96;
     const svg = sv('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'Contrato x cronograma' }); box.replaceChildren(svg);
     const mx = Math.max(total, contr) * 1.05; const x = (v) => (v / mx) * W; const y0 = 30, bh = 26;
-    svg.append(sv('rect', { x: 0, y: y0, width: x(real), height: bh, rx: 3, fill: css('--accent') }));
-    svg.append(sv('rect', { x: x(real), y: y0, width: x(total) - x(real), height: bh, rx: 3, fill: css('--muted-bar') }));
+    svg.append(sv('rect', { class: 'bar-h', x: 0, y: y0, width: x(real), height: bh, rx: 3, fill: css('--accent') }));
+    svg.append(sv('rect', { class: 'bar-h', style: 'transition-delay:500ms', x: x(real), y: y0, width: x(total) - x(real), height: bh, rx: 3, fill: css('--muted-bar') }));
     svg.append(sv('line', { x1: x(contr), x2: x(contr), y1: y0 - 10, y2: y0 + bh + 8, stroke: css('--fg'), 'stroke-width': 2, 'stroke-dasharray': '4 3' }));
     const t1 = sv('text', { class: 'v', x: x(contr), y: y0 - 14, 'text-anchor': 'end' }); t1.textContent = `800h contratadas`; svg.append(t1);
     const t2 = sv('text', { x: 0, y: y0 + bh + 22 }); t2.textContent = `${fmtH(real)} realizadas`; svg.append(t2);
@@ -708,15 +735,82 @@ footer { border-top: 1px solid var(--line); padding-block: 18px 32px; font-size:
   // ---------- abas ----------
   const pages = ['visao', 'setembro', 'outubro', 'ejecty', 'cronograma'];
   const drawAll = () => draws.forEach((f) => { try { f(); } catch (e) { console.error(e); } });
+  const RM = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // barras: crescem quando o gráfico entra na tela
+  const io = 'IntersectionObserver' in window ? new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); e.target.dataset.seen = '1'; io.unobserve(e.target); } }), { threshold: 0.25 }) : null;
+  const armCharts = () => document.querySelectorAll('section.page:not([hidden]) .chart').forEach((c) => {
+    if (RM || !io || c.dataset.seen) { c.classList.add('in'); return; }
+    c.classList.remove('in'); io.observe(c);
+  });
+  // números: contam do zero até o valor
+  const parseN = (t) => {
+    let m = t.match(/^([+−]?)(\d+)h(\d{2})?$/); if (m) return { v: +m[2] + (m[3] ? +m[3] / 60 : 0), f: (x) => m[1] + fmtH(x) };
+    m = t.match(/^(\d{1,3}(?:\.\d{3})+|\d+)(%?)$/); if (m) return { v: +m[1].replace(/\./g, ''), f: (x) => nf.format(Math.round(x)) + m[2] };
+    return null;
+  };
+  const runCount = (el) => { const p = parseN(el.dataset.final); if (!p) return; const t1 = performance.now(), dur = 1200;
+    const step = (now) => { const k = Math.min(1, (now - t1) / dur), e = 1 - Math.pow(1 - k, 3); el.textContent = k < 1 ? p.f(p.v * e) : el.dataset.final; if (k < 1) requestAnimationFrame(step); }; requestAnimationFrame(step); };
+  const ioN = 'IntersectionObserver' in window ? new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { ioN.unobserve(e.target); runCount(e.target); } }), { threshold: 0.4 }) : null;
+  const armNums = () => document.querySelectorAll('section.page:not([hidden]) .tile .n').forEach((el) => {
+    if (!el.dataset.final) el.dataset.final = el.textContent.trim();
+    const p = parseN(el.dataset.final); if (RM || !ioN || !p) { el.textContent = el.dataset.final; return; }
+    el.textContent = p.f(0); ioN.observe(el);
+  });
+  // hero: 5 sistemas soltos viram 1 Debx para as 4 empresas
+  (() => {
+    const svg = $('hero-svg'); if (!svg) return;
+    const AQ = '#7FD1D9', WARM = '#E8B35C', INK = '#F2EFE8', BG = '#0C3A40', HUB = [300, 180];
+    const C = [[95, 62, 'Nicomo'], [505, 62, 'Translogs'], [95, 298, 'Metalloys'], [505, 298, 'Schem']];
+    const SY = [[228, 58], [372, 112], [300, 306], [186, 196], [418, 238]];
+    const MAP = [[0, 3, 2], [1, 4, 0], [3, 2, 4], [4, 1, 2]];
+    const gA = sv('g'), gB = sv('g'), gS = sv('g'), gC = sv('g'), gP = sv('g'); svg.append(gA, gB, gS, gP, gC);
+    const linesA = []; MAP.forEach((ss, ci) => ss.forEach((si) => { const l = sv('line', { stroke: WARM, 'stroke-width': 1.4, 'stroke-dasharray': '4 5', opacity: 0 }); l._c = ci; l._s = si; linesA.push(l); gA.append(l); }));
+    const linesB = C.map(([x, y]) => { const l = sv('line', { x1: x, y1: y, x2: HUB[0], y2: HUB[1], stroke: AQ, 'stroke-width': 2.2, 'stroke-linecap': 'round', opacity: 0 }); const len = Math.hypot(x - HUB[0], y - HUB[1]); l.setAttribute('stroke-dasharray', len); l._len = len; gB.append(l); return l; });
+    const sys = SY.map((p, i) => { const g = sv('g'); g.append(sv('rect', { x: -26, y: -16, width: 52, height: 32, rx: 7, fill: 'rgba(232,179,92,.14)', stroke: WARM, 'stroke-width': 1.4 }));
+      [-6, 0, 6].forEach((dy) => g.append(sv('line', { x1: -12, x2: 12, y1: dy, y2: dy, stroke: WARM, 'stroke-width': 1.6, 'stroke-linecap': 'round', opacity: .8 }))); gS.append(g); g._p = p; g._i = i; return g; });
+    const hub = sv('g'); hub.append(sv('circle', { r: 46, fill: AQ })); const ht = sv('text', { y: 6, 'text-anchor': 'middle', 'font-size': 22, 'font-weight': 700, fill: BG }); ht.textContent = 'Debx'; hub.append(ht);
+    const hs = sv('text', { y: 24, 'text-anchor': 'middle', 'font-size': 10, 'font-weight': 600, fill: BG }); hs.textContent = '+ Ejecty'; hub.append(hs); gS.append(hub);
+    const ring = sv('circle', { cx: HUB[0], cy: HUB[1], r: 46, fill: 'none', stroke: AQ, 'stroke-width': 2, opacity: 0 }); gS.append(ring);
+    C.forEach(([x, y, n]) => { const g = sv('g', { transform: `translate(${x},${y})` }); g.append(sv('rect', { x: -62, y: -20, width: 124, height: 40, rx: 20, fill: BG, stroke: INK, 'stroke-width': 1.4 }));
+      const t = sv('text', { y: 5, 'text-anchor': 'middle', 'font-size': 14, 'font-weight': 600, fill: INK }); t.textContent = n; g.append(t); gC.append(g); });
+    const pulses = []; C.forEach((c, i) => [0, 0.5].forEach((ph) => { const d = sv('circle', { r: 3.6, fill: INK, opacity: 0 }); d._c = i; d._ph = ph; d._dir = i % 2 ? 1 : -1; gP.append(d); pulses.push(d); }));
+    const sA = $('hs-a'), sB = $('hs-b');
+    const ease = (k) => k < 0 ? 0 : k > 1 ? 1 : k * k * (3 - 2 * k); const seg = (t, a, b) => ease((t - a) / (b - a));
+    const T = 11;
+    const frame = (t) => {
+      const fadeIn = seg(t, 0, 0.6), conv = seg(t, 4, 5.6), out = 1 - seg(t, 10.2, 11), drawB = seg(t, 5.4, 6.4);
+      const phaseB = t >= 4.8;
+      sA.classList.toggle('on', !phaseB); sB.classList.toggle('on', phaseB);
+      sys.forEach((g) => { const [x0, y0] = g._p; const wob = Math.sin(t * 2.2 + g._i * 1.7) * 3 * (1 - conv);
+        const x = x0 + (HUB[0] - x0) * conv + wob, y = y0 + (HUB[1] - y0) * conv + Math.cos(t * 1.9 + g._i) * 3 * (1 - conv);
+        g.setAttribute('transform', `translate(${x},${y}) scale(${1 - 0.6 * conv})`); g.setAttribute('opacity', fadeIn * (1 - seg(t, 5, 5.6))); g._x = x; g._y = y; });
+      linesA.forEach((l) => { const [cx, cy] = C[l._c]; const g = sys[l._s]; l.setAttribute('x1', cx); l.setAttribute('y1', cy); l.setAttribute('x2', g._x); l.setAttribute('y2', g._y);
+        l.setAttribute('opacity', 0.75 * fadeIn * (1 - conv) * (0.75 + 0.25 * Math.sin(t * 5 + l._s))); l.setAttribute('stroke-dashoffset', -t * 14); });
+      const hk = seg(t, 4.6, 5.8); hub.setAttribute('transform', `translate(${HUB[0]},${HUB[1]}) scale(${0.2 + 0.8 * hk})`); hub.setAttribute('opacity', hk * out);
+      const rp = ((t - 6) % 1.6) / 1.6; ring.setAttribute('r', 46 + rp * 34); ring.setAttribute('opacity', t > 6 ? (1 - rp) * 0.6 * out : 0);
+      linesB.forEach((l) => { l.setAttribute('stroke-dashoffset', l._len * (1 - drawB)); l.setAttribute('opacity', drawB * out); });
+      pulses.forEach((d) => { const [cx, cy] = C[d._c]; let k = ((t * 0.55 + d._ph) % 1); if (d._dir < 0) k = 1 - k;
+        d.setAttribute('cx', cx + (HUB[0] - cx) * k); d.setAttribute('cy', cy + (HUB[1] - cy) * k); d.setAttribute('opacity', t > 6.4 ? out * 0.95 : 0); });
+      gC.setAttribute('opacity', Math.max(fadeIn, 0.001) * (t > 10.2 ? Math.max(out, 0.35) : 1));
+    };
+    if (RM) { frame(8); return; }
+    let visible = true, start = performance.now(), raf = 0;
+    const loop = (now) => { frame(((now - start) / 1000) % T); raf = requestAnimationFrame(loop); };
+    const go = () => { cancelAnimationFrame(raf); if (visible && !document.hidden && !$('visao').hidden) raf = requestAnimationFrame(loop); };
+    if ('IntersectionObserver' in window) new IntersectionObserver((es) => { visible = es[0].isIntersecting; go(); }, { threshold: 0.05 }).observe($('hero'));
+    document.addEventListener('visibilitychange', go); window.addEventListener('hashchange', () => setTimeout(go, 0));
+    frame(0); go();
+  })();
+
   const show = () => {
     const h = location.hash.slice(1); const pg = pages.includes(h) ? h : 'visao';
     document.querySelectorAll('section.page').forEach((s) => { s.hidden = s.dataset.page !== pg; });
     document.querySelectorAll('nav.tabs a').forEach((a) => { if (a.dataset.tab === pg) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
-    drawAll(); if (pages.includes(h)) window.scrollTo(0, 0);
+    document.querySelectorAll(`section.page[data-page="${pg}"] .chart`).forEach((c) => { delete c.dataset.seen; }); drawAll(); armCharts(); armNums(); if (pages.includes(h)) window.scrollTo(0, 0);
   };
   window.addEventListener('hashchange', show);
-  let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(drawAll, 150); });
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', drawAll);
+  let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { drawAll(); armCharts(); }, 150); });
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { drawAll(); armCharts(); });
   show();
 })();
 </script>
