@@ -105,6 +105,13 @@ section.page { display: flex; flex-direction: column; gap: 32px; }
 
 .tbox { overflow: auto; max-height: 560px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
 .tbox.auto { max-height: none; }
+.gap { display: grid; gap: 14px; }
+.gap .g { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; align-items: baseline; }
+.gap .g b { font-weight: 600; } .gap .g .v { font-variant-numeric: tabular-nums; color: var(--bad); font-weight: 600; }
+.gap .g .m { grid-column: 1 / -1; height: 8px; border-radius: 4px; background: var(--muted-bar); overflow: hidden; }
+.gap .g .m i { display: block; height: 100%; background: var(--bad); border-radius: 4px; }
+.gap .g .small { grid-column: 1 / -1; }
+.grp { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin: 18px 0 8px; }
 table { width: 100%; border-collapse: collapse; font-size: 14px; }
 th { position: sticky; top: 0; background: var(--panel); text-align: left; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); padding: 10px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
 td { padding: 9px 12px; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
@@ -629,22 +636,22 @@ footer { border-top: 1px solid var(--line); padding-block: 18px 32px; font-size:
 <!-- ===================== EJECTY ===================== -->
 <section class="page" id="ejecty" data-page="ejecty" hidden>
   <div class="lead">
-    <span class="pill ok">No prazo · desenvolvimento e integração</span>
+    <span class="pill warn">Integração pronta · falta cadastro no Debx</span>
     <h1>CRM Ejecty integrado ao Debx</h1>
-    <p>A Ejecty substitui o Mercos e entra em produção em <b>23/11/2026</b>, rodando em paralelo com o pré go-live do Debx. É contrato à parte, com gestão de João Dini (Metalloys) e Marcos Soares (Ejecty).</p>
+    <p>A Ejecty substitui o Mercos e entra em produção em <b>23/11/2026</b>, rodando em paralelo com o pré go-live do Debx. É contrato à parte, com gestão de João Dini (Metalloys) e Marcos Soares (Ejecty). <b>A integração está pronta e ligada.</b> O que segura a venda pelo Ejecty agora é cadastro no Debx: o primeiro pedido de teste foi recusado por falta de regra fiscal.</p>
   </div>
   <div class="tiles">
     <div class="tile"><div class="n" id="e-dias">—</div><div class="l">dias para o go-live</div><div class="s">Ejecty em 23/11/2026</div></div>
     <div class="tile"><div class="n">2 / 5</div><div class="l">fase em andamento</div><div class="s">Desenvolvimento e integração</div></div>
     <div class="tile"><div class="n">4 + 1</div><div class="l">módulos + dashboard</div><div class="s">Dashboard de compras customizado</div></div>
-    <div class="tile warn"><div class="n">10/11</div><div class="l">requisitos comerciais</div><div class="s">Marcos e Marinho · frete e impostos</div></div>
+    <div class="tile warn"><div class="n">12</div><div class="l">cadastros pendentes no Debx</div><div class="s">3 impedem qualquer pedido</div></div>
   </div>
 
   <div class="block">
     <h2>Fases</h2>
     <div class="phases">
       <div class="phase done"><b>Discovery</b><span class="small">até 5 dias · concluído</span></div>
-      <div class="phase now"><b>Desenvolvimento e integração</b><span class="small">30 dias · em andamento</span></div>
+      <div class="phase now"><b>Desenvolvimento e integração</b><span class="small">integração pronta · falta cadastro</span></div>
       <div class="phase"><b>Homologação</b><span class="small">10 dias · início de novembro</span></div>
       <div class="phase"><b>Testes</b><span class="small">5 dias</span></div>
       <div class="phase"><b>Go-live</b><span class="small">23/11/2026</span></div>
@@ -663,6 +670,16 @@ footer { border-top: 1px solid var(--line); padding-block: 18px 32px; font-size:
   </div>
 
   <div class="block">
+    <h2>O que falta cadastrar no Debx para vender pelo Ejecty</h2>
+    <p class="note">Levantamento de 07/11 no banco METAL_MATRIZ, só leitura, sobre os 2.421 produtos ativos das linhas da Metalloys e os 14.046 clientes ativos. Cada item cadastrado no Debx aparece no Ejecty em até 5 minutos, sem ação a mais.</p>
+    <div class="card"><div class="gap"><div class="g"><b>Clientes sem agrupamento fiscal</b><span class="v">14.040 de 14.046</span><div class="m" role="img" aria-label="100% sem cadastro"><i style="width:100.0%"></i></div><span class="small">Sem agrupamento, o cliente não passa em nenhuma regra fiscal.</span></div><div class="g"><b>Agrupamentos de produto sem regra fiscal de venda</b><span class="v">86 de 87</span><div class="m" role="img" aria-label="99% sem cadastro"><i style="width:98.9%"></i></div><span class="small">Só 1 dos 87 tem regra vigente, e nenhum produto com preço está nele.</span></div><div class="g"><b>Clientes sem forma ou condição de pagamento</b><span class="v">14.038 de 14.046</span><div class="m" role="img" aria-label="100% sem cadastro"><i style="width:99.9%"></i></div><span class="small">Hoje o pedido usa o que o vendedor escolhe no Ejecty, ou à vista.</span></div><div class="g"><b>Clientes sem vendedor</b><span class="v">14.046 de 14.046</span><div class="m" role="img" aria-label="100% sem cadastro"><i style="width:100.0%"></i></div><span class="small">Nenhum cliente está ligado a um representante.</span></div><div class="g"><b>Produtos sem preço vigente</b><span class="v">2.074 de 2.421</span><div class="m" role="img" aria-label="86% sem cadastro"><i style="width:85.7%"></i></div><span class="small">Aparecem sem preço no Ejecty, e o pedido com item sem preço é recusado.</span></div><div class="g"><b>Produtos sem agrupamento fiscal</b><span class="v">1.866 de 2.421</span><div class="m" role="img" aria-label="77% sem cadastro"><i style="width:77.1%"></i></div><span class="small">Cada produto vai para o agrupamento do seu NCM.</span></div><div class="g"><b>Produtos sem peso</b><span class="v">2.420 de 2.421</span><div class="m" role="img" aria-label="100% sem cadastro"><i style="width:100.0%"></i></div><span class="small">O Ejecty usa 0,001 kg; o peso é necessário para o frete.</span></div></div></div>
+    <div class="grp">1 · Sem isto, nenhum pedido entra no Debx</div><div class="tbox auto"><table><thead><tr><th>#</th><th>Cadastro</th><th>Como está</th><th>O que fazer</th><th>Quem</th></tr></thead><tbody><tr><td class="nw">1.1</td><td><b>Regras fiscais de venda (natureza 7)</b></td><td>4 regras vigentes. Só 1 dos 87 agrupamentos de produto tem regra. O pedido de teste foi recusado: "Material sem IPI configurado no cliente informado!"</td><td>Revisar e aprovar as 89 regras pendentes, criadas em 20/10, que cobrem 18 agrupamentos, e criar as dos demais</td><td class="nw">Fiscal + Luciano</td></tr><tr><td class="nw">1.3</td><td><b>Agrupamento dos clientes</b></td><td>14.040 de 14.046 clientes ativos sem agrupamento</td><td>Colocar cada cliente no seu grupo fiscal (ex.: 2, nacionais contribuintes; 12, base de ICMS reduzida). Há 29 grupos</td><td class="nw">Fiscal / cadastro</td></tr><tr><td class="nw">1.4</td><td><b>Agrupamento dos produtos</b></td><td>1.866 de 2.421 produtos sem agrupamento</td><td>Colocar cada produto no agrupamento do seu NCM</td><td class="nw">Fiscal / cadastro</td></tr></tbody></table></div>
+    <div class="grp">2 · Para o vendedor conseguir vender</div><div class="tbox auto"><table><thead><tr><th>#</th><th>Cadastro</th><th>Como está</th><th>O que fazer</th><th>Quem</th></tr></thead><tbody><tr><td class="nw">2.1</td><td><b>Preço de venda</b></td><td>2.074 de 2.421 produtos sem preço vigente</td><td>Carregar a tabela NET dos produtos que serão vendidos, ou definir quais ficam "sob consulta" ou fora do Ejecty (pendência C8)</td><td class="nw">Mário / Alisson + Luciano</td></tr><tr><td class="nw">2.2</td><td><b>Moeda de cada preço</b></td><td>As tabelas usam a moeda 999, que a integração não consegue ler. Hoje todos os preços aparecem em US$ no Ejecty, por suposição</td><td>Liberar a F_UNIVAL para o usuário da integração e marcar a moeda certa em cada tabela</td><td class="nw">DBA + comercial</td></tr><tr><td class="nw">2.3</td><td><b>Representantes</b></td><td>3 no Debx: Emerson, João Dini e o 00005</td><td>Cadastrar todos os vendedores e representantes que vão usar o Ejecty, com e-mail (a integração liga pelo e-mail)</td><td class="nw">Comercial</td></tr><tr><td class="nw">2.4</td><td><b>Carteira de cada vendedor</b></td><td>Nenhum cliente ligado a vendedor</td><td>Ligar cada cliente ao seu representante</td><td class="nw">Comercial</td></tr><tr><td class="nw">2.5</td><td><b>Forma e condição de pagamento</b></td><td>14.038 clientes sem forma ou sem condição</td><td>Preencher no cadastro do cliente</td><td class="nw">Financeiro</td></tr></tbody></table></div>
+    <div class="grp">3 · Frete e entrega</div><div class="tbox auto"><table><thead><tr><th>#</th><th>Cadastro</th><th>Como está</th><th>O que fazer</th><th>Quem</th></tr></thead><tbody><tr><td class="nw">3.1</td><td><b>Tabelas de frete por região</b></td><td>Tabela de frete vazia, com 22 regiões e 2 tarifas cadastradas</td><td>Cadastrar o frete por região depois do treinamento com o Luciano (pendência C25)</td><td class="nw">Logística (Meire)</td></tr></tbody></table></div>
+    <div class="grp">4 · Qualidade do cadastro (não impede, mas aparece no Ejecty)</div><div class="tbox auto"><table><thead><tr><th>#</th><th>Cadastro</th><th>Como está</th><th>O que fazer</th><th>Quem</th></tr></thead><tbody><tr><td class="nw">4.1</td><td><b>Peso dos produtos</b></td><td>2.420 de 2.421 sem peso</td><td>Preencher peso bruto e líquido</td><td class="nw">Cadastro</td></tr><tr><td class="nw">4.5</td><td><b>Clientes por empresa</b></td><td>Todos os clientes vão para a Metalloys</td><td>Definir como separar os clientes da Schem e da Nicomo (pendência C22)</td><td class="nw">Mário / Alisson / João</td></tr><tr><td class="nw">4.6</td><td><b>Unidade de negócio por filial</b></td><td>Só existe a 01; o Ejecty tem Cotia, Itajaí, Caxias do Sul e Pernambuco</td><td>Confirmar se as filiais são unidades de negócio no Debx (pendência C2)</td><td class="nw">João</td></tr></tbody></table></div>
+  </div>
+
+  <div class="block">
     <h2>Decisões</h2>
     <div class="grid2">
       <div class="dec"><span class="t">Debx é a fonte de preço, frete e impostos</span><span>O Ejecty não guarda cadastro próprio desses dados; calcula a venda a partir das tabelas do Debx.</span><span class="d">28/10</span></div>
@@ -678,10 +695,11 @@ footer { border-top: 1px solid var(--line); padding-block: 18px 32px; font-size:
       <div class="card"><ul>
         <li>Acesso ao servidor da Metalloys liberado e conexão com o banco testada.</li>
         <li>Instância da Metalloys criada na plataforma Ejecty.</li>
-        <li>Em andamento: integração de clientes, produtos e preços, regras fiscais, pedidos e faturamento.</li>
-        <li>A seguir: primeira carga de dados, validação do mapeamento com a Metalloys e o dashboard de compras.</li>
+        <li><b>07/11:</b> integração pronta e ligada. O Ejecty recebe sozinho o que for cadastrado no Debx, em até 5 minutos, e o pedido feito no Ejecty entra no Debx pela rotina do próprio Debx.</li>
+        <li><b>07/11:</b> primeiro pedido de teste recusado pelo Debx por falta de regra fiscal (IPI). Levantamento do que falta cadastrar acima.</li>
+        <li>A seguir: o fiscal aprovar as regras de venda, carregar preços e agrupamentos, e validar com o comercial.</li>
         <li>Frete: cerca de 18 cidades com frete negociado calculado pela planilha da Logística; nas demais, o vendedor digita a cotação.</li>
-      </ul><p class="small" style="margin-top:10px">Fonte: status report da Ejecty de 07/10 e reuniões de 27 e 28/10.</p></div>
+      </ul><p class="small" style="margin-top:10px">Fonte: status report da Ejecty de 07/10, reuniões de 27 e 28/10 e levantamento de cadastro de 07/11.</p></div>
     </div>
     <div class="block">
       <h2>Próximos marcos</h2>
@@ -697,8 +715,8 @@ footer { border-top: 1px solid var(--line); padding-block: 18px 32px; font-size:
   <div class="block">
     <h2>Pontos de atenção</h2>
     <div class="grid3">
-      <div class="blk"><b>Tabelas de frete ainda não existem no Debx</b><span>Hoje o frete está numa planilha da Logística. Sem as tabelas, o Ejecty não tem de onde calcular. Luciano treina a Logística.</span></div>
-      <div class="blk"><b>Depende do cadastro de produtos</b><span>Preço, imposto e isenção saem do cadastro de produtos e clientes do Debx, que ainda está em limpeza.</span></div>
+      <div class="blk"><b>Tabelas de frete ainda não existem no Debx</b><span>A tabela de frete está vazia (22 regiões e 2 tarifas cadastradas). Hoje o frete está numa planilha da Logística. A Meire cadastra depois do treinamento com o Luciano.</span></div>
+      <div class="blk"><b>Regra fiscal trava todos os pedidos</b><span>Sem regra de venda por agrupamento e sem agrupamento nos clientes, o Debx recusa qualquer pedido. São 89 regras esperando aprovação do fiscal desde 20/10.</span></div>
       <div class="blk"><b>Prazo do frete</b><span>Os requisitos de frete só fecham em 10/11 e o go-live é em 23/11. Vale decidir se o cálculo de frete entra no go-live ou numa segunda fase.</span></div>
       <div class="blk"><b>Pedidos entre 23/11 e 04/01</b><span>O ERP atual segue como oficial e o Debx roda em paralelo: definir para qual ERP vai cada pedido.</span></div>
       <div class="blk"><b>Cadastro duplicado de clientes</b><span>Clientes podem nascer nos dois sistemas, inclusive pelo celular: definir o dono do cadastro.</span></div>
@@ -710,9 +728,9 @@ footer { border-top: 1px solid var(--line); padding-block: 18px 32px; font-size:
     <div class="block">
       <h2>Equipe</h2>
       <div class="card"><ul>
-        <li><b>Metalloys:</b> João Dini (gestão do projeto), Alisson Marcelino e Mario Ogata (comercial), Marinho.</li>
+        <li><b>Metalloys:</b> João Dini (gestão do projeto), Alisson Marcelino e Mario Ogata (comercial), Marinho, Fiscal (regras e agrupamentos), Financeiro (condições de pagamento), Meire (frete).</li>
         <li><b>Ejecty:</b> Marcos Soares (responsável técnico), Luan Francisco (gerente de projetos), Wanderley Tavares Jr. (executivo comercial).</li>
-        <li><b>Zucchetti/Debx:</b> Luciano (tabelas de frete e impostos).</li>
+        <li><b>Zucchetti/Debx:</b> Luciano (regras fiscais, preços e treinamento de frete).</li>
       </ul></div>
     </div>
     <div class="block">
