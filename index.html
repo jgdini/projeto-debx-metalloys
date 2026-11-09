@@ -176,6 +176,7 @@ footer { border-top: 1px solid var(--line); padding-block: 18px 32px; font-size:
       <a href="#setembro" data-tab="setembro">Setembro</a>
       <a href="#outubro" data-tab="outubro">Outubro</a>
       <a href="#novembro" data-tab="novembro">Novembro</a>
+      <a href="#oss" data-tab="oss">OSs</a>
       <a href="#ejecty" data-tab="ejecty">CRM Ejecty</a>
       <a href="#cronograma" data-tab="cronograma">Cronograma</a>
     </nav>
@@ -561,6 +562,49 @@ footer { border-top: 1px solid var(--line); padding-block: 18px 32px; font-size:
   </div>
 </section>
 
+<!-- ===================== OSs ===================== -->
+<section class="page" id="oss" data-page="oss" hidden>
+  <div class="lead">
+    <span class="pill plain">Controle de OSs · julho a novembro de 2026</span>
+    <h1>OSs recebidas e o que falta</h1>
+    <p>Todas as OSs da Zucchetti no índice da pasta do projeto, cruzadas com o cronograma de 27/10. Uma agenda conta como coberta quando há OS do mesmo consultor na mesma data, ou quando o cronograma cita o número de uma OS recebida.</p>
+  </div>
+  <div class="tiles">
+    <div class="tile"><div class="n" id="x-n">—</div><div class="l">OSs recebidas</div><div class="s">De julho a novembro</div></div>
+    <div class="tile"><div class="n" id="x-h">—</div><div class="l">horas em OS</div><div class="s">Soma do índice</div></div>
+    <div class="tile warn"><div class="n" id="x-falta">—</div><div class="l">agendas sem OS</div><div class="s">Cronograma e fechamento de setembro</div></div>
+    <div class="tile warn"><div class="n" id="x-fora">—</div><div class="l">OSs fora do cronograma</div><div class="s">Conferir antes de aprovar</div></div>
+  </div>
+
+  <div class="block">
+    <h2>Agendas sem OS</h2>
+    <p class="note">Agendas já passadas que não têm OS correspondente. "Realizado" no cronograma e sem OS é a falta mais provável; "Planejado" com data passada pode não ter acontecido.</p>
+    <div class="tbox auto"><table><thead><tr><th>Data</th><th>Agenda</th><th>Área</th><th>Consultor</th><th class="r">Horas prev.</th><th>Situação</th></tr></thead><tbody id="x-falta-t"></tbody></table></div>
+  </div>
+
+  <div class="block">
+    <h2>OSs por mês e consultor</h2>
+    <p class="note">Quantidade de OSs e horas. Clique numa célula para filtrar a lista abaixo.</p>
+    <div class="tbox auto"><table id="x-mat"></table></div>
+  </div>
+
+  <div class="block">
+    <h2>OSs fora do cronograma</h2>
+    <p class="note">OSs cobradas sem tarefa do mesmo consultor na mesma data no cronograma. Não é erro por si só, mas é o que vale conferir na fatura.</p>
+    <div class="tbox auto"><table><thead><tr><th>Data</th><th>OS</th><th>Consultor</th><th>Assunto</th><th class="r">Horas</th></tr></thead><tbody id="x-fora-t"></tbody></table></div>
+  </div>
+
+  <div class="block" id="x-lista">
+    <h2>Todas as OSs</h2>
+    <div class="filters">
+      <select id="x-fm" aria-label="Mês"><option value="">Todos os meses</option></select>
+      <select id="x-fc" aria-label="Consultor"><option value="">Todos os consultores</option></select>
+      <span class="count" id="x-cnt"></span>
+    </div>
+    <div class="tbox"><table><thead><tr><th>OS</th><th>Data</th><th>Consultor</th><th class="hide-sm">Assunto</th><th class="r">Horas</th></tr></thead><tbody id="x-all"></tbody></table></div>
+  </div>
+</section>
+
 <!-- ===================== EJECTY ===================== -->
 <section class="page" id="ejecty" data-page="ejecty" hidden>
   <div class="lead">
@@ -888,8 +932,59 @@ footer { border-top: 1px solid var(--line); padding-block: 18px 32px; font-size:
     return el('tr', {}, el('td', { class: 'nw' }, r.data ? fmtD(r.data) : 'nov'), el('td', {}, r.area), el('td', {}, r.assunto), el('td', { class: 'hide-sm' }, r.consultor || '—'), el('td', { class: 'r' }, r.horas == null ? 'a definir' : fmtH(r.horas)), el('td', {}, st));
   }));
 
+  // ---------- controle de OSs ----------
+  (() => {
+    const MESN = { '2026-07': 'Jul', '2026-08': 'Ago', '2026-09': 'Set', '2026-10': 'Out', '2026-11': 'Nov', '2026-12': 'Dez', '2027-01': 'Jan' };
+    const first = (c) => c.split(' ')[0];
+    const nums = new Set(D.oss.map((o) => o.os.replace(/^0+/, '')));
+    const MANUAL = { 'MTL-037': ['7490', '7491', '7492', '7493'] }; // customização de itens controlados
+    const names = (c) => (c || '').split(/[\/,]|\s+e\s+/i).map((x) => x.trim().toLowerCase()).filter((x) => x.length > 2 && x !== 'zucchetti');
+    const used = new Set();
+    const falta = [];
+    for (const r of D.cronograma) {
+      if (!r.data || r.data >= todayISO) continue;
+      if (!r.consultor && !MANUAL[r.codigo]) continue; // tarefas internas da Metalloys
+      const refs = (r.observacao || '').match(/OS\s?\d{4}/g) || []; const refN = refs.map((x) => x.replace(/\D/g, ''));
+      refN.filter((n) => nums.has(n)).forEach((n) => used.add(n));
+      const ns = names(r.consultor);
+      const m = D.oss.filter((o) => o.data === r.data && ns.some((n) => o.consultor.toLowerCase().startsWith(n)));
+      m.forEach((o) => used.add(o.os.replace(/^0+/, '')));
+      (MANUAL[r.codigo] || []).forEach((n) => used.add(n));
+      const ok = m.length || refN.some((n) => nums.has(n)) || (MANUAL[r.codigo] || []).some((n) => nums.has(n));
+      if (!ok) {
+        const miss = refN.filter((n) => !nums.has(n));
+        falta.push({ data: r.data, ag: `${r.codigo} · ${r.assunto.length > 64 ? r.assunto.slice(0, 62).trim() + '…' : r.assunto}`, area: r.area, cons: r.consultor || '—', h: r.horas, st: r.status, nota: miss.length ? `OS ${miss.join(', ')} citada no cronograma, não recebida` : (r.status === 'Realizado' ? 'Realizado no cronograma, sem OS' : 'Data passou, sem OS') });
+      }
+    }
+    // pendências do fechamento de setembro que não estão no cronograma
+    [['2026-09-02', 'Configurações fiscais', 'Fiscal', 'Katia'], ['2026-09-17', 'RH', 'RH', 'Leo'], ['2026-09-21', 'Comex', 'Importação', '—'], ['2026-09-23', 'RH', 'RH', 'Leo'], ['2026-09-24', 'Comex', 'Importação', '—']]
+      .forEach(([d, ag, a, c]) => falta.push({ data: d, ag, area: a, cons: c, h: null, st: 'Setembro', nota: 'Registrada sem OS no fechamento de setembro' }));
+    falta.sort((p, q) => p.data.localeCompare(q.data));
+    $('x-falta-t').replaceChildren(...falta.map((f) => el('tr', {}, el('td', { class: 'nw' }, fmtD(f.data)), el('td', {}, f.ag), el('td', {}, f.area), el('td', {}, f.cons), el('td', { class: 'r' }, f.h == null ? '—' : fmtH(f.h)),
+      el('td', {}, el('span', { class: f.st === 'Realizado' || /citada/.test(f.nota) ? 'pill bad' : 'pill warn' }, f.nota)))));
+    const fora = D.oss.filter((o) => !used.has(o.os.replace(/^0+/, ''))).sort((p, q) => p.data.localeCompare(q.data));
+    $('x-fora-t').replaceChildren(...fora.map((o) => el('tr', {}, el('td', { class: 'nw' }, fmtD(o.data)), el('td', { class: 'nw' }, o.os.replace(/^0+/, '')), el('td', {}, first(o.consultor)), el('td', {}, o.assunto), el('td', { class: 'r' }, fmtH(o.horas)))));
+    set('x-n', nf.format(D.oss.length)); set('x-h', fmtH(D.oss.reduce((a, o) => a + o.horas, 0))); set('x-falta', nf.format(falta.length)); set('x-fora', nf.format(fora.length));
+    // matriz
+    const meses = Array.from(new Set(D.oss.map((o) => o.mes))).sort(); const cons = Array.from(new Set(D.oss.map((o) => first(o.consultor)))).sort((p, q) => p.localeCompare(q, 'pt-BR'));
+    const cell = (c, m) => { const r = D.oss.filter((o) => (!c || first(o.consultor) === c) && (!m || o.mes === m)); return r.length ? `${r.length} · ${fmtH(r.reduce((a, o) => a + o.horas, 0))}` : '—'; };
+    const btn = (txt, c, m) => { if (txt === '—') return el('span', { class: 'small' }, '—'); const b = el('button', { type: 'button', class: 'clear', style: 'min-height:32px;padding:4px 8px;font-variant-numeric:tabular-nums' }, txt); b.addEventListener('click', () => { $('x-fc').value = c || ''; $('x-fm').value = m || ''; renderAll(); $('x-lista').scrollIntoView({ behavior: 'smooth' }); }); return b; };
+    $('x-mat').replaceChildren(
+      el('thead', {}, el('tr', {}, el('th', {}, 'Consultor'), ...meses.map((m) => el('th', { class: 'r' }, MESN[m] || m)), el('th', { class: 'r' }, 'Total'))),
+      el('tbody', {}, ...cons.map((c) => el('tr', {}, el('td', { class: 'nw' }, c), ...meses.map((m) => el('td', { class: 'r' }, btn(cell(c, m), c, m))), el('td', { class: 'r' }, btn(cell(c, null), c, null))))),
+      el('tfoot', {}, el('tr', {}, el('td', {}, 'Total'), ...meses.map((m) => el('td', { class: 'r' }, cell(null, m))), el('td', { class: 'r' }, cell(null, null)))));
+    // lista
+    meses.forEach((m) => $('x-fm').append(new Option(MESN[m] + '/' + m.slice(2, 4), m))); cons.forEach((c) => $('x-fc').append(new Option(c, c)));
+    function renderAll() {
+      const m = $('x-fm').value, c = $('x-fc').value; const rows = D.oss.filter((o) => (!m || o.mes === m) && (!c || first(o.consultor) === c)).sort((p, q) => p.data.localeCompare(q.data));
+      $('x-all').replaceChildren(...rows.map((o) => el('tr', {}, el('td', { class: 'nw' }, o.os.replace(/^0+/, '')), el('td', { class: 'nw' }, fmtD(o.data) + '/' + o.data.slice(2, 4)), el('td', {}, first(o.consultor)), el('td', { class: 'hide-sm' }, o.assunto), el('td', { class: 'r' }, fmtH(o.horas)))));
+      set('x-cnt', `${nf.format(rows.length)} OSs · ${fmtH(rows.reduce((a, o) => a + o.horas, 0))}`);
+    }
+    $('x-fm').addEventListener('change', renderAll); $('x-fc').addEventListener('change', renderAll); renderAll();
+  })();
+
   // ---------- abas ----------
-  const pages = ['visao', 'setembro', 'outubro', 'novembro', 'ejecty', 'cronograma'];
+  const pages = ['visao', 'setembro', 'outubro', 'novembro', 'oss', 'ejecty', 'cronograma'];
   const drawAll = () => draws.forEach((f) => { try { f(); } catch (e) { console.error(e); } });
   const RM = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   // barras: crescem quando o gráfico entra na tela
