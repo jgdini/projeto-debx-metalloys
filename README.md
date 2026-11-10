@@ -1,7 +1,9 @@
 # Projeto Debx · Metalloys
 
-Painel do projeto de implantação do ERP Debx (Zucchetti) e do CRM Ejecty no Grupo Metalloys: visão geral, fechamento de setembro, fechamento de outubro, CRM Ejecty e cronograma.
+Painel do projeto de implantação do ERP Debx (Zucchetti) e do CRM Ejecty no Grupo Metalloys (Nicomo, Translogs, Metalloys e Schem).
 
-Página única (`index.html`), sem build. Publicada pelo GitHub Pages a partir da branch `main`.
+Abas: Visão geral · Setembro · Outubro · Novembro · OSs · CRM Ejecty · Cronograma.
 
-Posição dos dados: 29/10/2026. Fontes: kick-off Zucchetti (16/06/2026), cronograma Zucchetti (27/10/2026), OSs da Zucchetti, atas das reuniões e status reports do Ejecty.
+Página única (`index.html`), sem build. Os dados ficam embutidos no próprio arquivo. Publicada pelo GitHub Pages a partir da branch `main`.
+
+Posição dos dados: 09/11/2026. Fontes: kick-off Zucchetti (16/06/2026), cronograma V3 da Zucchetti (09/11/2026), OSs assinadas da Zucchetti, gravações e atas das reuniões e status reports do Ejecty.
